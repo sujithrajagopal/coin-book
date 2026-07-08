@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Coin Book · World Cup 2026</title>
+<meta name="theme-color" content="#0E1013">
+<style>
+  html,body{margin:0;padding:0;background:#0E1013;-webkit-text-size-adjust:100%}
+  *,*::before,*::after{box-sizing:border-box}
+  button{cursor:pointer;font:inherit}
+  input,select{font:inherit}
+  .flex{display:flex}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}
+  .items-center{align-items:center}.items-start{align-items:flex-start}.items-baseline{align-items:baseline}
+  .justify-between{justify-content:space-between}
+  .gap-1{gap:4px}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}.gap-5{gap:20px}
+  .grid{display:grid}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}
+  .overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .min-w-0{min-width:0}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* Cloud backend: connected to Sujith's Firebase Realtime Database.
+   Everyone who opens this file shares one live board. */
+window.FIREBASE_CONFIG = {
+  databaseURL: "https://world-cup-league-ded51-default-rtdb.firebaseio.com",
+  projectId: "world-cup-league-ded51"
+};
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+const { useState, useEffect, useRef, useCallback } = React;
+window.__claudeMode = !!window.storage;
+window.__storageMode = "claude";
+(function initStorage() {
+  if (window.storage) return;
+  let localStore = null;
+  try {
+    const ls = window.localStorage;
+    ls.setItem("__wc_test", "1");
+    ls.removeItem("__wc_test");
+    localStore = {
+      get(k) {
+        return ls.getItem("wc_" + k);
+      },
+      set(k, v) {
+        ls.setItem("wc_" + k, String(v));
+      },
+      del(k) {
+        ls.removeItem("wc_" + k);
+      },
+      keys() {
+        const out = [];
+        for (let i = 0; i < ls.length; i++) {
+          const kk = ls.key(i) || "";
+          if (kk.indexOf("wc_") === 0) out.push(kk.slice(3));
+        }
+        return out;
+      }
+    };
+  } catch (e) {
+    const mem = /* @__PURE__ */ new Map();
+    localStore = {
+      get(k) {
+        return mem.has(k) ? mem.get(k) : null;
+      },
+      set(k, v) {
+        mem.set(k, String(v));
+      },
+      del(k) {
+        mem.delete(k);
+      },
+      keys() {
+        return Array.from(mem.keys());
+      }
+    };
+  }
+  const cfg = window.FIREBASE_CONFIG || {};
+  const cloudConfigured = cfg.databaseURL && cfg.databaseURL.indexOf("PASTE") === -1;
+  if (cloudConfigured && window.firebase) {
+    try {
+      firebase.initializeApp(cfg);
+      const root = firebase.database().ref("coinbook");
+      let cache = {};
+      let readyResolve;
+      window.__storageReady = new Promise((res) => {
+        readyResolve = res;
+      });
+      root.on("value", (snap) => {
+        cache = snap.val() || {};
+        if (readyResolve) {
+          readyResolve();
+          readyResolve = null;
+        }
+        window.dispatchEvent(new Event("wc-sync"));
+      }, () => {
+        if (readyResolve) {
+          readyResolve();
+          readyResolve = null;
+        }
+      });
+      setTimeout(() => {
+        if (readyResolve) {
+          readyResolve();
+          readyResolve = null;
+        }
+      }, 4e3);
+      const enc = (k) => k.replace(/[.#$\[\]\/]/g, "_");
+      window.__storageMode = "cloud";
+      window.storage = {
+        async get(k, shared) {
+          const v = shared ? cache[enc(k)] : localStore.get(k);
+          if (v === null || v === void 0) throw new Error("not found");
+          return { key: k, value: v };
+        },
+        async set(k, v, shared) {
+          if (shared) {
+            cache[enc(k)] = String(v);
+            await root.child(enc(k)).set(String(v));
+          } else localStore.set(k, String(v));
+          return { key: k, value: v };
+        },
+        async delete(k, shared) {
+          if (shared) {
+            delete cache[enc(k)];
+            await root.child(enc(k)).remove();
+          } else localStore.del(k);
+          return { key: k, deleted: true };
+        },
+        async list(p, shared) {
+          const pool = shared ? Object.keys(cache) : localStore.keys();
+          return { keys: pool.filter((k) => k.indexOf(p || "") === 0) };
+        }
+      };
+      return;
+    } catch (e) {
+    }
+  }
+  window.__storageMode = localStore.keys ? "local" : "memory";
+  try {
+    window.localStorage.getItem("__t");
+    window.__storageMode = "local";
+  } catch (e) {
+    window.__storageMode = "memory";
+  }
+  window.storage = {
+    async get(k) {
+      const v = localStore.get(k);
+      if (v === null || v === void 0) throw new Error("not found");
+      return { key: k, value: v };
+    },
+    async set(k, v) {
+      localStore.set(k, String(v));
+      return { key: k, value: v };
+    },
+    async delete(k) {
+      localStore.del(k);
+      return { key: k, deleted: true };
+    },
+    async list(p) {
+      return { keys: localStore.keys().filter((k) => k.indexOf(p || "") === 0) };
+    }
+  };
+})();
+const C = {
+  night: "#0E1013",
+  card: "#15181D",
+  cardHi: "#1D2127",
+  line: "#262B33",
+  chalk: "#E9E7E2",
+  chalkDim: "#8B909A",
+  coin: "#D4AF6A",
+  coinDeep: "#A8874A",
+  live: "#3ECF9A",
+  out: "#F26D6D",
+  ink: "#0E1013",
+  violet: "#8B7CF6"
+};
+const FONT = "@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');";
+const display = { fontFamily: "'Space Grotesk', system-ui, sans-serif" };
+const body = { fontFamily: "'Inter', system-ui, sans-serif" };
+const uid = () => Math.random().toString(36).slice(2, 9);
+const K_LEAGUE = "wcal4:league";
+const K_BETS = "wcal4:bets";
+const K_LOG = "wcal4:log";
+const K_ME = "wcal4:me";
+const K_SNAP = "wcal4:snap:";
+const ROUNDS = ["QF", "SF", "Final"];
+const STATS_ASOF = "8 Jul 2026";
+const FLAGS = { France: "🇫🇷", Morocco: "🇲🇦", Spain: "🇪🇸", Belgium: "🇧🇪", England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Norway: "🇳🇴", Argentina: "🇦🇷", Switzerland: "🇨🇭" };
+const flag = (name) => FLAGS[name] || "⚽";
+const TEAM_STATS = {
+  France: {
+    prob: 72,
+    gf: 14,
+    ga: 2,
+    cs: 3,
+    xg: 2.06,
+    xga: 0.73,
+    xgd: "+1.33",
+    group: "Won Group I (3W 0D 0L)",
+    form: [
+      { r: "W", s: "3-1", o: "SEN", xg: 1.79, xga: 0.56 },
+      { r: "W", s: "3-0", o: "IRQ", xg: 2.38, xga: 0.6 },
+      { r: "W", s: "4-1", o: "NOR", xg: 1.5, xga: 1.7, note: "Outshot on xG, won 4-1: Dembele hat trick, ruthless finishing" },
+      { r: "W", s: "3-0", o: "SWE", xg: 3.17, xga: 0.66 },
+      { r: "W", s: "1-0", o: "PAR", xg: 1.45, xga: 0.13, note: "Mbappe penalty settled it" }
+    ],
+    players: [{ n: "Mbappe", g: 7, a: 2, num: 10 }, { n: "Dembele", g: 4, num: 11 }]
+  },
+  Morocco: {
+    prob: 28,
+    gf: 10,
+    ga: 4,
+    cs: 2,
+    xg: 1.6,
+    xga: 0.7,
+    xgd: "+0.90",
+    group: "2nd Group C (2W 1D 0L)",
+    form: [
+      { r: "D", s: "1-1", o: "BRA", xg: 1.53, xga: 1.23 },
+      { r: "W", s: "1-0", o: "SCO", xg: 0.99, xga: 0.51 },
+      { r: "W", s: "4-2", o: "HTI", xg: 3.26, xga: 0.66 },
+      { r: "D", s: "1-1", o: "NED", xg: 1.38, xga: 0.24, pens: true, note: "Controlled the tie, needed pens to finish it" },
+      { r: "W", s: "3-0", o: "CAN", xg: 0.82, xga: 0.84, note: "3 goals from 0.82 xG: clinical, not sustainable" }
+    ],
+    players: [{ n: "Saibari", g: 3, num: 15 }]
+  },
+  Spain: {
+    prob: 71,
+    gf: 9,
+    ga: 0,
+    cs: 5,
+    xg: 2,
+    xga: 0.31,
+    xgd: "+1.70",
+    group: "Won Group H (2W 1D 0L)",
+    form: [
+      { r: "D", s: "0-0", o: "CPV", xg: 2.29, xga: 0.3, note: "2.29 xG, no goals: wasteful opening night" },
+      { r: "W", s: "4-0", o: "KSA", xg: 2.3, xga: 0.15 },
+      { r: "W", s: "1-0", o: "URU", xg: 0.86, xga: 0.2 },
+      { r: "W", s: "3-0", o: "AUT", xg: 2.8, xga: 0.29 },
+      { r: "W", s: "1-0", o: "POR", xg: 1.77, xga: 0.6, note: "Merino late winner, ended Ronaldo's World Cup" }
+    ],
+    players: [{ n: "Oyarzabal", g: 4, num: 21 }]
+  },
+  Belgium: {
+    prob: 29,
+    gf: 13,
+    ga: 5,
+    cs: 1,
+    xg: 2.14,
+    xga: 1.24,
+    xgd: "+0.90",
+    group: "Won Group G (1W 2D 0L)",
+    form: [
+      { r: "D", s: "1-1", o: "EGY", xg: 1.35, xga: 1.08 },
+      { r: "D", s: "0-0", o: "IRN", xg: 1.79, xga: 0.62 },
+      { r: "W", s: "5-1", o: "NZL", xg: 3.65, xga: 0.25 },
+      { r: "W", s: "3-2", o: "SEN", xg: 1.74, xga: 3.58, note: "Survived a 3.58 xGA barrage: fortunate to advance" },
+      { r: "W", s: "4-1", o: "USA", xg: 2.15, xga: 0.67 }
+    ],
+    players: [{ n: "Trossard", g: 2, num: 17 }, { n: "De Ketelaere", g: 2, num: 22 }]
+  },
+  England: {
+    prob: 65,
+    gf: 11,
+    ga: 5,
+    cs: 2,
+    xg: 1.81,
+    xga: 0.87,
+    xgd: "+0.94",
+    group: "Won Group L (2W 1D 0L)",
+    form: [
+      { r: "W", s: "4-2", o: "CRO", xg: 2.8, xga: 0.71 },
+      { r: "D", s: "0-0", o: "GHA", xg: 1.28, xga: 0.33 },
+      { r: "W", s: "2-0", o: "PAN", xg: 1.4, xga: 0.59 },
+      { r: "W", s: "2-1", o: "COD", xg: 2.04, xga: 0.8, note: "Trailed 1-0, Kane double rescued it" },
+      { r: "W", s: "3-2", o: "MEX", xg: 1.55, xga: 1.94, note: "Beat the hosts at the Azteca against the xG" }
+    ],
+    players: [{ n: "Kane", g: 6, num: 9 }, { n: "Bellingham", g: 4, num: 22 }]
+  },
+  Norway: {
+    prob: 35,
+    gf: 12,
+    ga: 9,
+    cs: 0,
+    xg: 1.88,
+    xga: 1.59,
+    xgd: "+0.29",
+    group: "2nd Group I (2W 0D 1L)",
+    form: [
+      { r: "W", s: "4-1", o: "IRQ", xg: 2.53, xga: 0.77 },
+      { r: "W", s: "3-2", o: "SEN", xg: 2.1, xga: 1.7 },
+      { r: "L", s: "1-4", o: "FRA", xg: 1.7, xga: 1.5, note: "xG says an even game: scoreboard says 1-4. Haaland rested" },
+      { r: "W", s: "2-1", o: "CIV", xg: 2.02, xga: 1.36, note: "Haaland winner" },
+      { r: "W", s: "2-1", o: "BRA", xg: 1.05, xga: 2.61, note: "Huge xG overperformance: Haaland brace stunned Brazil" }
+    ],
+    players: [{ n: "Haaland", g: 7, num: 9 }]
+  },
+  Argentina: {
+    prob: 69,
+    gf: 14,
+    ga: 5,
+    cs: 2,
+    xg: 2.19,
+    xga: 0.6,
+    xgd: "+1.59",
+    group: "Won Group J (3W 0D 0L)",
+    form: [
+      { r: "W", s: "3-0", o: "ALG", xg: 1.23, xga: 0.31, note: "Messi hat trick on opening night" },
+      { r: "W", s: "2-0", o: "AUT", xg: 2.62, xga: 0.5 },
+      { r: "W", s: "3-1", o: "JOR", xg: 2.13, xga: 0.76 },
+      { r: "W", s: "3-2", o: "CPV", xg: 2.16, xga: 0.45, note: "Sloppy late goals conceded" },
+      { r: "W", s: "3-2", o: "EGY", xg: 2.8, xga: 0.98, note: "Came from 2-0 down: Messi equalised, 8th of the tournament" }
+    ],
+    players: [{ n: "Messi", g: 8, num: 10 }]
+  },
+  Switzerland: {
+    prob: 31,
+    gf: 9,
+    ga: 3,
+    cs: 2,
+    xg: 1.84,
+    xga: 0.88,
+    xgd: "+0.96",
+    group: "Won Group B (2W 1D 0L)",
+    form: [
+      { r: "D", s: "1-1", o: "QAT", xg: 3.24, xga: 0.76, note: "3.24 xG for one goal: staggeringly wasteful" },
+      { r: "W", s: "4-1", o: "BIH", xg: 2.06, xga: 0.23 },
+      { r: "W", s: "2-1", o: "CAN", xg: 1.11, xga: 1.66, note: "Won the group despite losing the xG battle" },
+      { r: "W", s: "2-0", o: "ALG", xg: 2.45, xga: 0.74 },
+      { r: "D", s: "0-0", o: "COL", xg: 0.35, xga: 1.03, pens: true, note: "Created almost nothing, survived to pens and held nerve" }
+    ],
+    players: [{ n: "Manzambi", g: 3, num: 16 }]
+  }
+};
+const formColor = (r) => r === "W" ? C.live : r === "D" ? C.coin : C.out;
+const KITS = {
+  France: ["#1F4FA3", "#FFFFFF"],
+  Morocco: ["#C1272D", "#0E6B37"],
+  Spain: ["#AA151B", "#F1BF00"],
+  Belgium: ["#E30613", "#FDDA24"],
+  England: ["#FFFFFF", "#1B2A4A"],
+  Norway: ["#EF2B2D", "#FFFFFF"],
+  Argentina: ["#75AADB", "#FFFFFF"],
+  Switzerland: ["#DA291C", "#FFFFFF"]
+};
+const kitFor = (team) => KITS[team] || [C.coin, C.ink];
+function PlayerAvatar({ teamName, num, name, size }) {
+  const [shirt, trim] = kitFor(teamName);
+  const s = size || 44;
+  const label = num ? num : (name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  const dark = shirt === "#FFFFFF";
+  return /* @__PURE__ */ React.createElement("svg", { width: s, height: s, viewBox: "0 0 64 64" }, /* @__PURE__ */ React.createElement(
+    "path",
+    {
+      d: "M22 8 L27 4 H37 L42 8 L56 18 L49 28 L44 24 V58 H20 V24 L15 28 L8 18 Z",
+      fill: shirt,
+      stroke: dark ? trim : C.ink,
+      strokeWidth: "3",
+      strokeLinejoin: "round"
+    }
+  ), /* @__PURE__ */ React.createElement("path", { d: "M27 4 Q32 10 37 4", fill: "none", stroke: dark ? trim : C.ink, strokeWidth: "3" }), /* @__PURE__ */ React.createElement(
+    "text",
+    {
+      x: "32",
+      y: "46",
+      textAnchor: "middle",
+      fontFamily: "'Space Grotesk', sans-serif",
+      fontWeight: "700",
+      fontSize: num ? 22 : 16,
+      fill: dark ? trim : "#FFFFFF",
+      stroke: dark ? "none" : C.ink,
+      strokeWidth: dark ? 0 : 0.8
+    },
+    label
+  ));
+}
+const FACT = [1, 1, 2, 6, 24, 120, 720];
+const pois = (k, l) => Math.exp(-l) * Math.pow(l, k) / FACT[k];
+const scoreProb = (h, a, lh, la) => pois(h, lh) * pois(a, la);
+const fmtOdds = (o) => o >= 100 ? Math.round(o).toString() : o >= 10 ? o.toFixed(1) : o.toFixed(2);
+const round1 = (x) => Math.round(x * 10) / 10;
+const mkFx = (id, round, home, away, kickoff, label, oddsH, oddsA, lh, la, scorers) => ({
+  id,
+  round,
+  home,
+  away,
+  kickoff,
+  label,
+  locked: false,
+  settled: false,
+  resultH: 0,
+  resultA: 0,
+  winner: "",
+  oddsH,
+  oddsA,
+  lh,
+  la,
+  scorers: scorers.map(([name, team, odds, num]) => ({ id: uid(), name, team, odds, num: num || 0, scored: false }))
+});
+const DEFAULT_FIXTURES = [
+  mkFx("f1", "QF", "France", "Morocco", "2026-07-09T20:00:00Z", "Fri 10 Jul, 6:00 am AEST", 1.38, 3.61, 1.38, 1.17, [
+    ["Mbappe", "home", 1.85, 10],
+    ["Dembele", "home", 2.6, 11],
+    ["Thuram", "home", 2.8, 15],
+    ["Griezmann", "home", 3.2, 7],
+    ["Olise", "home", 3.4, 14],
+    ["Coman", "home", 3.6, 20],
+    ["Barcola", "home", 3.8, 12],
+    ["Rabiot", "home", 8.5, 8],
+    ["Camavinga", "home", 9, 6],
+    ["Tchouameni", "home", 9.5, 18],
+    ["Upamecano", "home", 15, 4],
+    ["Saliba", "home", 17, 17],
+    ["En-Nesyri", "away", 3.6, 19],
+    ["El Kaabi", "away", 3.8, 9],
+    ["Brahim Diaz", "away", 4, 10],
+    ["Rahimi", "away", 4.5, 20],
+    ["Ziyech", "away", 5, 7],
+    ["Ezzalzouli", "away", 5.5, 21],
+    ["Hakimi", "away", 5.5, 2],
+    ["Saibari", "away", 6, 15],
+    ["Ounahi", "away", 8, 8],
+    ["Amrabat", "away", 12, 4],
+    ["Aguerd", "away", 13, 5],
+    ["Mazraoui", "away", 15, 3]
+  ]),
+  mkFx("f2", "QF", "Spain", "Belgium", "2026-07-10T19:00:00Z", "Sat 11 Jul, 5:00 am AEST", 1.41, 3.44, 1.62, 1.23, [
+    ["Lamine Yamal", "home", 2.1, 10],
+    ["Oyarzabal", "home", 2.6, 21],
+    ["Nico Williams", "home", 2.7, 17],
+    ["Morata", "home", 3, 7],
+    ["Ferran Torres", "home", 3.4, 11],
+    ["Dani Olmo", "home", 4, 20],
+    ["Pedri", "home", 5.5, 8],
+    ["Merino", "home", 7, 6],
+    ["Fabian Ruiz", "home", 8, 16],
+    ["Zubimendi", "home", 12, 18],
+    ["Carvajal", "home", 15, 2],
+    ["Cucurella", "home", 16, 24],
+    ["Lukaku", "away", 3.2, 9],
+    ["Openda", "away", 3.6, 16],
+    ["Doku", "away", 4, 11],
+    ["Trossard", "away", 4.2, 17],
+    ["De Bruyne", "away", 4.5, 7],
+    ["De Ketelaere", "away", 4.5, 22],
+    ["Bakayoko", "away", 5, 14],
+    ["Saelemaekers", "away", 7, 8],
+    ["Tielemans", "away", 8, 6],
+    ["Onana", "away", 10, 24],
+    ["Castagne", "away", 14, 21],
+    ["Theate", "away", 16, 5]
+  ]),
+  mkFx("f3", "QF", "Norway", "England", "2026-07-11T21:00:00Z", "Sun 12 Jul, 7:00 am AEST", 2.84, 1.54, 1.38, 1.7, [
+    ["Haaland", "home", 2, 9],
+    ["Sorloth", "home", 3.2, 19],
+    ["Strand Larsen", "home", 3.6, 23],
+    ["Odegaard", "home", 4.5, 10],
+    ["Bobb", "home", 5, 26],
+    ["Nusa", "home", 5.5, 11],
+    ["Thorstvedt", "home", 8, 18],
+    ["Berge", "home", 10, 8],
+    ["Aursnes", "home", 10, 15],
+    ["Ryerson", "home", 16, 2],
+    ["Ajer", "home", 15, 3],
+    ["Kane", "away", 1.9, 9],
+    ["Saka", "away", 3, 7],
+    ["Palmer", "away", 3.2, 10],
+    ["Bellingham", "away", 3.4, 22],
+    ["Watkins", "away", 3.5, 19],
+    ["Foden", "away", 3.6, 11],
+    ["Gordon", "away", 4, 17],
+    ["Rashford", "away", 4.2, 20],
+    ["Rice", "away", 9, 4],
+    ["Alexander-Arnold", "away", 10, 2],
+    ["Stones", "away", 14, 5],
+    ["Guehi", "away", 16, 6]
+  ]),
+  mkFx("f4", "QF", "Argentina", "Switzerland", "2026-07-12T01:00:00Z", "Sun 12 Jul, 11:00 am AEST", 1.45, 3.25, 1.54, 1.22, [
+    ["Messi", "home", 2.1, 10],
+    ["Julian Alvarez", "home", 2.4, 9],
+    ["Lautaro Martinez", "home", 2.6, 22],
+    ["Garnacho", "home", 4, 16],
+    ["Almada", "home", 5.5, 21],
+    ["Mac Allister", "home", 6, 20],
+    ["Nico Gonzalez", "home", 6.5, 15],
+    ["Enzo Fernandez", "home", 7, 24],
+    ["De Paul", "home", 9, 7],
+    ["Paredes", "home", 12, 5],
+    ["Romero", "home", 14, 13],
+    ["Tagliafico", "home", 15, 3],
+    ["Embolo", "away", 3.8, 7],
+    ["Amdouni", "away", 4.5, 23],
+    ["Vargas", "away", 4.5, 17],
+    ["Ndoye", "away", 5, 10],
+    ["Rieder", "away", 6.5, 20],
+    ["Aebischer", "away", 9.5, 15],
+    ["Xhaka", "away", 9, 34],
+    ["Freuler", "away", 10, 8],
+    ["Sow", "away", 10, 14],
+    ["Akanji", "away", 13, 5],
+    ["Widmer", "away", 15, 3],
+    ["Elvedi", "away", 16, 4]
+  ]),
+  mkFx("f5", "SF", "SF1 Team A", "SF1 Team B", "2026-07-14T19:00:00Z", "Wed 15 Jul, 5:00 am AEST", 1.9, 1.9, 1.3, 1.3, []),
+  mkFx("f6", "SF", "SF2 Team A", "SF2 Team B", "2026-07-15T19:00:00Z", "Thu 16 Jul, 5:00 am AEST", 1.9, 1.9, 1.3, 1.3, []),
+  mkFx("f7", "Final", "Finalist A", "Finalist B", "2026-07-19T19:00:00Z", "Mon 20 Jul, 5:00 am AEST", 1.9, 1.9, 1.3, 1.3, [])
+];
+const freshLeague = () => ({
+  v: 4,
+  settings: { buyIn: 10, coins: 100, capQF: 40, capSF: 40, capFinal: 40, prize1: 50, prize2: 20, prize3: 10, adminPin: "2026" },
+  owners: ["Sathya", "Suj", "Srini", "Mani", "Ram", "Vivien", "Abhiram", "Nav"].map((n, i) => ({ id: "o" + i, name: n, num: i + 1, paidIn: false })),
+  fixtures: DEFAULT_FIXTURES
+});
+const MARKETS = [["winner", "Winner"], ["score", "Correct Score"], ["scorer", "Goalscorer"]];
+const marketLabel = (m) => (MARKETS.find(([k]) => k === m) || ["", m])[1];
+function Step({ value, onChange, min = 0 }) {
+  const btn = { width: 30, height: 30, borderRadius: 8, border: `1px solid ${C.line}`, background: C.cardHi, color: C.chalk, fontSize: 16, lineHeight: 1 };
+  return /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("button", { style: btn, onClick: () => onChange(Math.max(min, value - 1)) }, "−"), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 700, minWidth: 22, textAlign: "center", color: C.chalk }) }, value), /* @__PURE__ */ React.createElement("button", { style: btn, onClick: () => onChange(value + 1) }, "+"));
+}
+function Chip({ on, color, children, onClick }) {
+  return /* @__PURE__ */ React.createElement("button", { onClick, style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 999, border: `1px solid ${on ? color : C.line}`, background: on ? color + "22" : "transparent", color: on ? color : C.chalkDim }) }, children);
+}
+function FormPills({ name, size }) {
+  const st = TEAM_STATS[name];
+  if (!st) return null;
+  const s = size || 22;
+  return /* @__PURE__ */ React.createElement("div", { className: "flex gap-1" }, st.form.map((m, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { title: `${m.s} v ${m.o}`, style: __spreadProps(__spreadValues({}, display), { width: s, height: s, lineHeight: s + "px", borderRadius: "50%", fontSize: s * 0.55, fontWeight: 800, color: C.ink, background: formColor(m.r), position: "relative" }) }, m.r, m.pens ? "*" : ""), size >= 26 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 2 } }, m.s, /* @__PURE__ */ React.createElement("br", null), m.o))));
+}
+function Card({ children, style }) {
+  return /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ background: C.card, border: `1px solid ${C.line}`, borderRadius: 14, padding: 14 }, style) }, children);
+}
+function H({ children, color }) {
+  return /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 16, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: color || C.chalk }) }, children);
+}
+const inputStyle = __spreadProps(__spreadValues({}, body), { background: C.night, border: `1px solid ${C.line}`, borderRadius: 8, color: C.chalk, padding: "7px 10px", fontSize: 14, width: "100%", outline: "none" });
+function App() {
+  const [league, setLeague] = useState(freshLeague);
+  const [bets, setBets] = useState([]);
+  const [log, setLog] = useState([]);
+  const [me, setMe] = useState("");
+  const [tab, setTab] = useState("bets");
+  const [showSettings, setShowSettings] = useState(false);
+  const [snaps, setSnaps] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const [note, setNote] = useState("");
+  const [joinName, setJoinName] = useState("");
+  const [, setTick] = useState(0);
+  const [adminOk, setAdminOk] = useState(false);
+  const saveTimer = useRef(null);
+  const dirty = useRef(false);
+  const flash = (m) => {
+    setNote(m);
+    setTimeout(() => setNote(""), 1500);
+  };
+  useEffect(() => {
+    const iv = setInterval(() => setTick((t) => t + 1), 3e4);
+    return () => clearInterval(iv);
+  }, []);
+  useEffect(() => {
+    (async () => {
+      if (window.__storageReady) {
+        try {
+          await window.__storageReady;
+        } catch (e) {
+        }
+      }
+      try {
+        const r = await window.storage.get(K_LEAGUE, true);
+        if (r && r.value) setLeague(JSON.parse(r.value));
+      } catch (e) {
+      }
+      try {
+        const r = await window.storage.get(K_BETS, true);
+        if (r && r.value) setBets(JSON.parse(r.value));
+      } catch (e) {
+      }
+      try {
+        const r = await window.storage.get(K_LOG, true);
+        if (r && r.value) setLog(JSON.parse(r.value));
+      } catch (e) {
+      }
+      try {
+        const r = await window.storage.get(K_ME);
+        if (r && r.value) setMe(r.value);
+      } catch (e) {
+      }
+      setLoaded(true);
+    })();
+  }, []);
+  const leagueRef = useRef(league);
+  leagueRef.current = league;
+  const saveLeagueNow = useCallback(async () => {
+    clearTimeout(saveTimer.current);
+    try {
+      await window.storage.set(K_LEAGUE, JSON.stringify(leagueRef.current), true);
+      dirty.current = false;
+    } catch (e) {
+      flash("Save failed");
+    }
+  }, []);
+  useEffect(() => {
+    if (!loaded) return;
+    dirty.current = true;
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try {
+        await window.storage.set(K_LEAGUE, JSON.stringify(league), true);
+        dirty.current = false;
+        flash("Saved");
+      } catch (e) {
+        flash("Save failed");
+      }
+    }, 250);
+    return () => clearTimeout(saveTimer.current);
+  }, [league, loaded]);
+  useEffect(() => {
+    const flush = () => {
+      if (dirty.current) saveLeagueNow();
+    };
+    document.addEventListener("visibilitychange", flush);
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", flush);
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", flush);
+    };
+  }, [saveLeagueNow]);
+  useEffect(() => {
+    if (!loaded) return;
+    const iv = setInterval(async () => {
+      if (dirty.current) return;
+      try {
+        const r = await window.storage.get(K_LEAGUE, true);
+        if (r && r.value && r.value !== JSON.stringify(league)) setLeague(JSON.parse(r.value));
+      } catch (e) {
+      }
+      try {
+        const b = await window.storage.get(K_BETS, true);
+        if (b && b.value && b.value !== JSON.stringify(bets)) setBets(JSON.parse(b.value));
+      } catch (e) {
+      }
+    }, 2e4);
+    return () => clearInterval(iv);
+  }, [loaded, league, bets]);
+  useEffect(() => {
+    if (!loaded) return;
+    const onSync = async () => {
+      if (dirty.current) return;
+      try {
+        const r = await window.storage.get(K_LEAGUE, true);
+        if (r && r.value && r.value !== JSON.stringify(leagueRef.current)) setLeague(JSON.parse(r.value));
+      } catch (e) {
+      }
+      try {
+        const b = await window.storage.get(K_BETS, true);
+        if (b && b.value) setBets(JSON.parse(b.value));
+      } catch (e) {
+      }
+      try {
+        const l = await window.storage.get(K_LOG, true);
+        if (l && l.value) setLog(JSON.parse(l.value));
+      } catch (e) {
+      }
+    };
+    window.addEventListener("wc-sync", onSync);
+    return () => window.removeEventListener("wc-sync", onSync);
+  }, [loaded]);
+  const appendLog = useCallback(async (msg) => {
+    const entry = { t: Date.now(), msg };
+    try {
+      let cur = [];
+      try {
+        const r = await window.storage.get(K_LOG, true);
+        if (r && r.value) cur = JSON.parse(r.value);
+      } catch (e) {
+      }
+      const next = [entry, ...cur].slice(0, 150);
+      await window.storage.set(K_LOG, JSON.stringify(next), true);
+      setLog(next);
+    } catch (e) {
+      setLog((l) => [entry, ...l].slice(0, 150));
+    }
+  }, []);
+  const saveBets = useCallback(async (next) => {
+    setBets(next);
+    try {
+      await window.storage.set(K_BETS, JSON.stringify(next), true);
+    } catch (e) {
+      flash("Bet save failed");
+    }
+  }, []);
+  const S = league.settings;
+  const pool = league.owners.length * S.buyIn;
+  const setOwner = (id, patch) => setLeague((s) => __spreadProps(__spreadValues({}, s), { owners: s.owners.map((o) => o.id === id ? __spreadValues(__spreadValues({}, o), patch) : o) }));
+  const setFixture = (id, patch) => setLeague((s) => __spreadProps(__spreadValues({}, s), { fixtures: s.fixtures.map((f) => f.id === id ? __spreadValues(__spreadValues({}, f), patch) : f) }));
+  const oName = (o) => o && o.name.trim() || (o ? `Player ${league.owners.indexOf(o) + 1}` : "unknown");
+  const capFor = (round) => round === "QF" ? S.capQF : round === "SF" ? S.capSF : S.capFinal;
+  const fxById = (id) => league.fixtures.find((f) => f.id === id);
+  const fxStatus = (f) => f.settled ? "settled" : f.locked || Date.now() >= Date.parse(f.kickoff) ? "locked" : "open";
+  const spentTotal = (ownerId) => bets.filter((b) => b.ownerId === ownerId).reduce((s, b) => s + b.stake, 0);
+  const spentRound = (ownerId, round) => bets.filter((b) => {
+    const f = fxById(b.matchId);
+    return b.ownerId === ownerId && f && f.round === round;
+  }).reduce((s, b) => s + b.stake, 0);
+  const betReturn = (b) => {
+    const f = fxById(b.matchId);
+    if (!f || !f.settled) return 0;
+    let won = false;
+    if (b.market === "winner") won = f.winner === b.pick;
+    else if (b.market === "score") won = `${f.resultH}-${f.resultA}` === b.pick;
+    else if (b.market === "scorer") {
+      const sc = f.scorers.find((s) => s.id === b.pick);
+      won = !!(sc && sc.scored);
+    }
+    return won ? round1(b.stake * b.odds) : 0;
+  };
+  const totalPts = (ownerId) => round1(bets.filter((b) => b.ownerId === ownerId).reduce((s, b) => s + betReturn(b), 0));
+  const pickLabel = (b) => {
+    const f = fxById(b.matchId);
+    if (!f) return b.pick;
+    if (b.market === "winner") return b.pick === "home" ? f.home : f.away;
+    if (b.market === "score") return b.pick;
+    const sc = f.scorers.find((s) => s.id === b.pick);
+    return sc ? sc.name : "player";
+  };
+  const rows = league.owners.map((o) => ({ o, pts: totalPts(o.id), spent: spentTotal(o.id) })).sort((a, b) => b.pts - a.pts || a.spent - b.spent);
+  const refreshSnaps = async () => {
+    try {
+      const r = await window.storage.list(K_SNAP);
+      setSnaps((r && r.keys || []).sort().reverse());
+    } catch (e) {
+      setSnaps([]);
+    }
+  };
+  const takeSnap = async () => {
+    try {
+      await window.storage.set(K_SNAP + Date.now(), JSON.stringify({ league, bets }));
+      flash("Snapshot saved");
+      refreshSnaps();
+    } catch (e) {
+      flash("Snapshot failed");
+    }
+  };
+  const restoreSnap = async (key) => {
+    try {
+      const r = await window.storage.get(key);
+      if (r && r.value) {
+        const s = JSON.parse(r.value);
+        setLeague(s.league);
+        await saveBets(s.bets || []);
+        appendLog("Snapshot restored (" + new Date(Number(key.replace(K_SNAP, ""))).toLocaleString() + ")");
+        flash("Restored");
+      }
+    } catch (e) {
+      flash("Restore failed");
+    }
+  };
+  useEffect(() => {
+    if (loaded && showSettings) refreshSnaps();
+  }, [showSettings, loaded]);
+  const joinLeague = async () => {
+    const nm = joinName.trim();
+    if (!nm) {
+      flash("Type your name first");
+      return;
+    }
+    let target = league.owners.find((o) => o.name.trim().toLowerCase() === nm.toLowerCase());
+    if (!target) target = league.owners.find((o) => !o.name.trim());
+    if (!target) {
+      flash("League full, ask the admin");
+      return;
+    }
+    if (!target.name.trim()) {
+      const updated = __spreadProps(__spreadValues({}, leagueRef.current), { owners: leagueRef.current.owners.map((o) => o.id === target.id ? __spreadProps(__spreadValues({}, o), { name: nm }) : o) });
+      setLeague(updated);
+      leagueRef.current = updated;
+      try {
+        await window.storage.set(K_LEAGUE, JSON.stringify(updated), true);
+        dirty.current = false;
+      } catch (e) {
+        flash("Save failed");
+      }
+      appendLog(`${nm} joined the league`);
+    }
+    setMe(target.id);
+    try {
+      await window.storage.set(K_ME, target.id);
+    } catch (e) {
+    }
+    flash(`Welcome, ${nm}: saved`);
+  };
+  const nextOpen = league.fixtures.filter((f) => fxStatus(f) === "open").sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
+  const fmtLeft = (ms) => {
+    if (ms <= 0) return "now";
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+    return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+  };
+  const copyText = async (text, okMsg) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      flash(okMsg);
+    } catch (e) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        flash(okMsg);
+      } catch (e2) {
+        flash("Copy failed");
+      }
+    }
+  };
+  const medal = (i) => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`;
+  const standingsText = () => {
+    const lines = rows.map((r, i) => `${medal(i)} *${oName(r.o)}*: ${r.pts} pts (${S.coins - r.spent} coins left)`);
+    const nxt = nextOpen ? `
+⏳ Next lock: ${nextOpen.home} v ${nextOpen.away}, ${nextOpen.label}` : "";
+    return `⚽ *WORLD CUP GAME: STANDINGS* 🏆
+
+${lines.join("\n")}
+
+💰 A$${S.prize1} | A$${S.prize2} | A$${S.prize3}${nxt}`;
+  };
+  const rulesText = () => `⚽ *WORLD CUP GAME* 🏆
+
+${league.owners.length} people × A$${S.buyIn} = A$${pool} prize pool
+
+Everyone gets *${S.coins} coins*, quarterfinals to the Final.
+Round caps: QF max ${S.capQF} | SF max ${S.capSF} | Final max ${S.capFinal}
+Caps add to more than ${S.coins}, so budget carefully. Losing stakes are gone.
+
+*Three markets per match, odds shown in the app:*
+🏅 Winner (incl. penalties)
+🎯 Correct score (90/120 min)
+⚽ Anytime goalscorer
+
+One bet per market per match (up to 3 bets a match).
+Winning bet returns *stake × odds* as points.
+Example: 10 on Spain at 1.41 = 14.1 pts. 5 on 2-1 at 9.50 = 47.5 pts. 8 on Haaland at 2.00 = 16 pts.
+Correct score = score at end of play (pens excluded). Scorer = normal/extra time only.
+
+All bets in before kickoff, locks automatically, pull or change any bet until then. Every bet and admin change is on the public log.
+
+🥇 A$${S.prize1} | 🥈 A$${S.prize2} | 🥉 A$${S.prize3}
+Highest points after the Final wins. Ties break by fewer coins spent.`;
+  const placeBet = async (fx, market, pick, odds, stake) => {
+    if (!me) {
+      flash("Join or pick who you are first");
+      return;
+    }
+    if (stake < 1) {
+      flash("Stake at least 1 coin");
+      return;
+    }
+    if (!pick) {
+      flash("Make a selection first");
+      return;
+    }
+    const existing = bets.find((b) => b.ownerId === me && b.matchId === fx.id && b.market === market);
+    const freed = existing ? existing.stake : 0;
+    if (spentRound(me, fx.round) - freed + stake > capFor(fx.round)) {
+      flash(`Over the ${fx.round} cap of ${capFor(fx.round)}`);
+      return;
+    }
+    if (spentTotal(me) - freed + stake > S.coins) {
+      flash(`Over your ${S.coins}-coin total`);
+      return;
+    }
+    let cur = bets;
+    try {
+      const r = await window.storage.get(K_BETS, true);
+      if (r && r.value) cur = JSON.parse(r.value);
+    } catch (e) {
+    }
+    const next = cur.filter((b) => !(b.ownerId === me && b.matchId === fx.id && b.market === market));
+    next.push({ id: uid(), matchId: fx.id, ownerId: me, market, pick, odds, stake, t: Date.now() });
+    await saveBets(next);
+    const who = oName(league.owners.find((o) => o.id === me));
+    const lbl = market === "winner" ? pick === "home" ? fx.home : fx.away : market === "score" ? pick : (fx.scorers.find((s) => s.id === pick) || {}).name || "player";
+    appendLog(`${who}: ${stake} on ${lbl} @ ${fmtOdds(odds)} (${marketLabel(market)}, ${fx.round})`);
+    flash(`Bet in: returns ${round1(stake * odds)} pts if it lands`);
+  };
+  const pullBet = async (fx, market) => {
+    let cur = bets;
+    try {
+      const r = await window.storage.get(K_BETS, true);
+      if (r && r.value) cur = JSON.parse(r.value);
+    } catch (e) {
+    }
+    await saveBets(cur.filter((b) => !(b.ownerId === me && b.matchId === fx.id && b.market === market)));
+    const who = oName(league.owners.find((o) => o.id === me));
+    appendLog(`${who} pulled their ${marketLabel(market)} bet on ${fx.home} v ${fx.away}`);
+    flash("Bet pulled");
+  };
+  const settleFixture = async (fx) => {
+    if (!fx.winner) {
+      flash("Pick the match winner first");
+      return;
+    }
+    setFixture(fx.id, { settled: true, locked: true });
+    appendLog(`${fx.round} settled: ${fx.home} ${fx.resultH}-${fx.resultA} ${fx.away} (${fx.winner === "home" ? fx.home : fx.away} through)`);
+    flash("Settled, returns paid");
+  };
+  const requireAdmin = () => {
+    if (adminOk) return true;
+    const pin = prompt("Admin PIN required");
+    if (pin === null) return false;
+    if (pin === (S.adminPin || "2026")) {
+      setAdminOk(true);
+      const who = me ? oName(league.owners.find((o) => o.id === me)) : "someone";
+      appendLog(`Admin unlocked by ${who}`);
+      return true;
+    }
+    flash("Wrong PIN");
+    appendLog("Failed admin PIN attempt");
+    return false;
+  };
+  const tabs = [["bets", "Bets"], ["stats", "Stats"], ["value", "Value"], ["table", "Table"], ["rules", "Rules"], ["log", "Log"]];
+  return /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, body), { minHeight: "100vh", background: C.night, color: C.chalk, paddingBottom: 40 }) }, /* @__PURE__ */ React.createElement("style", null, FONT), /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 16px 12px", borderBottom: `1px solid ${C.line}`, background: `linear-gradient(180deg, ${C.card}, ${C.night})` } }, /* @__PURE__ */ React.createElement("div", { style: { height: 2, background: `linear-gradient(90deg, transparent, ${C.coin}, transparent)`, margin: "-20px -16px 16px" } }), /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 12, fontWeight: 600, letterSpacing: 4, color: C.coin, textTransform: "uppercase" }) }, "World Cup 2026 · Quarterfinals to Final"), /* @__PURE__ */ React.createElement("h1", { style: __spreadProps(__spreadValues({}, display), { fontSize: 32, fontWeight: 700, lineHeight: 1.05, textTransform: "uppercase", margin: "2px 0 0", color: C.chalk, letterSpacing: 1 }) }, "The Coin Book")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    if (showSettings) setShowSettings(false);
+    else if (requireAdmin()) setShowSettings(true);
+  }, style: __spreadProps(__spreadValues({}, body), { fontSize: 12, color: C.chalkDim, border: `1px solid ${C.line}`, borderRadius: 8, padding: "6px 10px", background: "transparent" }) }, showSettings ? "Close" : "🔒 Admin")), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 mt-2 flex-wrap", style: { fontSize: 12, color: C.chalkDim } }, /* @__PURE__ */ React.createElement("span", null, "Pool ", /* @__PURE__ */ React.createElement("b", { style: { color: C.coin } }, "A$", pool)), /* @__PURE__ */ React.createElement("span", null, "I am"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: me,
+      onChange: async (e) => {
+        setMe(e.target.value);
+        try {
+          await window.storage.set(K_ME, e.target.value);
+        } catch (err) {
+        }
+      },
+      style: __spreadProps(__spreadValues({}, inputStyle), { width: "auto", padding: "3px 8px", fontSize: 12 })
+    },
+    /* @__PURE__ */ React.createElement("option", { value: "" }, "choose…"),
+    league.owners.map((o, i) => /* @__PURE__ */ React.createElement("option", { key: o.id, value: o.id }, o.name.trim() || `Player ${i + 1}`))
+  ), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", color: C.live } }, note), (() => {
+    const mode = typeof window !== "undefined" ? window.__storageMode || "claude" : "claude";
+    const [label, col] = mode === "claude" ? ["● Live shared board", C.live] : mode === "cloud" ? ["● Live shared board (cloud)", C.live] : mode === "local" ? ["● Saved on this device only", C.coin] : ["● NOT SAVING: open in Safari or Chrome", C.out];
+    return /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 600, color: col } }, label);
+  })()), me && /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-2" }, ROUNDS.map((r) => {
+    const used = spentRound(me, r), cap = capFor(r);
+    return /* @__PURE__ */ React.createElement("div", { key: r, style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { fontSize: 10, color: C.chalkDim, letterSpacing: 1, textTransform: "uppercase" } }, /* @__PURE__ */ React.createElement("span", null, r), /* @__PURE__ */ React.createElement("span", { style: { color: used > cap ? C.out : C.coin } }, used, "/", cap)), /* @__PURE__ */ React.createElement("div", { style: { height: 6, borderRadius: 3, background: C.night, border: `1px solid ${C.line}`, overflow: "hidden", marginTop: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, used / cap * 100) + "%", height: "100%", background: used > cap ? C.out : `linear-gradient(90deg, ${C.coinDeep}, ${C.coin})` } })));
+  }), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", minWidth: 62 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, letterSpacing: 1, textTransform: "uppercase" } }, "Left"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, color: C.coin, lineHeight: 1 }) }, S.coins - spentTotal(me))))), showSettings && /* @__PURE__ */ React.createElement("div", { style: { padding: 16 } }, /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement(H, null, "League settings"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 mt-3" }, [["buyIn", "Buy-in (A$)"], ["coins", "Coins per player"], ["capQF", "QF round cap"], ["capSF", "SF round cap"], ["capFinal", "Final round cap"], ["prize1", "1st prize (A$)"], ["prize2", "2nd prize (A$)"], ["prize3", "3rd prize (A$)"]].map(([k, label]) => /* @__PURE__ */ React.createElement("label", { key: k, style: { fontSize: 12, color: C.chalkDim } }, label, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "number",
+      value: S[k],
+      style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }),
+      onChange: (e) => setLeague((s) => __spreadProps(__spreadValues({}, s), { settings: __spreadProps(__spreadValues({}, s.settings), { [k]: Number(e.target.value) || 0 }) })),
+      onBlur: () => appendLog(`Admin set ${label} to ${S[k]}`)
+    }
+  ))), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 12, color: C.chalkDim } }, "Admin PIN", /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "text",
+      value: S.adminPin || "2026",
+      style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }),
+      onChange: (e) => setLeague((s) => __spreadProps(__spreadValues({}, s), { settings: __spreadProps(__spreadValues({}, s.settings), { adminPin: e.target.value }) })),
+      onBlur: () => appendLog("Admin PIN was changed")
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 14, paddingTop: 12 } }, /* @__PURE__ */ React.createElement(H, null, "Players & buy-ins"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, margin: "2px 0 8px" } }, "Tick the coin when someone's A$", S.buyIn, " lands."), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col gap-2" }, league.owners.map((o, i) => /* @__PURE__ */ React.createElement("div", { key: o.id, className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("input", { value: o.name, placeholder: `Player ${i + 1}`, onChange: (e) => setOwner(o.id, { name: e.target.value }), onBlur: () => appendLog(`Admin set player ${i + 1} name to ${o.name || "(blank)"}`), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }), /* @__PURE__ */ React.createElement(Chip, { on: !!o.paidIn, color: C.live, onClick: () => {
+    setOwner(o.id, { paidIn: !o.paidIn });
+    appendLog(`Admin marked ${o.name || "player " + (i + 1)} as ${!o.paidIn ? "paid" : "unpaid"}`);
+  } }, o.paidIn ? "Paid ✓" : "Unpaid"))))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 14, paddingTop: 12 } }, /* @__PURE__ */ React.createElement(H, null, "Snapshots"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Save a checkpoint (yours only) and restore it if someone fat-fingers a result."), /* @__PURE__ */ React.createElement("button", { onClick: takeSnap, style: __spreadProps(__spreadValues({}, display), { fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "7px 14px" }) }, "Save snapshot"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col gap-2 mt-3" }, snaps.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "No snapshots yet."), snaps.map((k) => /* @__PURE__ */ React.createElement("div", { key: k, className: "flex items-center justify-between", style: { fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", null, new Date(Number(k.replace(K_SNAP, ""))).toLocaleString()), /* @__PURE__ */ React.createElement("button", { onClick: () => restoreSnap(k), style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 600, color: C.coin, background: "transparent", border: `1px solid ${C.coinDeep}`, borderRadius: 8, padding: "3px 10px" }) }, "Restore"))))), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => {
+        if (confirm("Wipe everything and start fresh?")) {
+          setLeague(freshLeague());
+          saveBets([]);
+          appendLog("League was reset by admin");
+        }
+      },
+      style: __spreadProps(__spreadValues({}, body), { marginTop: 14, fontSize: 12, fontWeight: 600, color: C.out, border: `1px solid ${C.out}55`, borderRadius: 8, padding: "6px 12px", background: "transparent" })
+    },
+    "Reset league"
+  ))), /* @__PURE__ */ React.createElement("div", { className: "flex overflow-x-auto", style: { padding: "10px 16px 0", gap: 6 } }, tabs.map(([k, label]) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: k,
+      onClick: () => setTab(k),
+      style: __spreadProps(__spreadValues({}, display), { flex: 1, fontSize: 15, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, padding: "7px 14px", borderRadius: 10, whiteSpace: "nowrap", border: `1px solid ${tab === k ? C.coin : C.line}`, background: tab === k ? C.coin : "transparent", color: tab === k ? C.night : C.chalkDim })
+    },
+    label
+  ))), /* @__PURE__ */ React.createElement("div", { style: { padding: 16 }, className: "flex flex-col gap-4" }, tab === "bets" && /* @__PURE__ */ React.createElement(React.Fragment, null, !me && /* @__PURE__ */ React.createElement(Card, { style: { borderColor: C.coin } }, /* @__PURE__ */ React.createElement(H, { color: C.coin }, "Join the league"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, margin: "4px 0 10px" } }, "Type your name to claim a spot. Everyone shares this board, so your bets will be visible to the whole group."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("input", { value: joinName, placeholder: "Your name", onChange: (e) => setJoinName(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }), /* @__PURE__ */ React.createElement("button", { onClick: joinLeague, style: __spreadProps(__spreadValues({}, display), { fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "7px 16px" }) }, "Join")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: 6 } }, "Already joined on another device? Type the same name to pick up your spot.")), nextOpen && /* @__PURE__ */ React.createElement(Card, { style: { padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13 } }, "⏳ Next lock: ", /* @__PURE__ */ React.createElement("b", null, nextOpen.home, " v ", nextOpen.away)), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 18, fontWeight: 800, color: C.coin }) }, fmtLeft(Date.parse(nextOpen.kickoff) - Date.now()))), ROUNDS.map((round) => {
+    const fxs = league.fixtures.filter((f) => f.round === round);
+    if (fxs.length === 0) return null;
+    return /* @__PURE__ */ React.createElement("div", { key: round, className: "flex flex-col gap-3" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-baseline justify-between", style: { marginTop: 4 } }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, textTransform: "uppercase", letterSpacing: 2 }) }, round === "QF" ? "Quarterfinals" : round === "SF" ? "Semifinals" : "Final"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalkDim } }, "round cap ", capFor(round), " coins")), fxs.map((fx) => /* @__PURE__ */ React.createElement(
+      FixtureCard,
+      {
+        key: fx.id,
+        fx,
+        status: fxStatus(fx),
+        league,
+        bets,
+        me,
+        S,
+        oName,
+        betReturn,
+        pickLabel,
+        requireAdmin,
+        appendLog,
+        placeBet,
+        pullBet,
+        setFixture,
+        settleFixture,
+        maxStake: me ? Math.min(capFor(fx.round) - spentRound(me, fx.round), S.coins - spentTotal(me)) : 0
+      }
+    )));
+  }), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => {
+        if (!requireAdmin()) return;
+        setLeague((s) => __spreadProps(__spreadValues({}, s), { fixtures: [...s.fixtures, __spreadValues({}, mkFx(uid(), "SF", "Team A", "Team B", new Date(Date.now() + 864e5).toISOString(), "Set kickoff", 1.9, 1.9, 1.3, 1.3, []))] }));
+        appendLog("Admin added a new fixture");
+      },
+      style: __spreadProps(__spreadValues({}, display), { fontSize: 14, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: C.coin, background: "transparent", border: `1px dashed ${C.coinDeep}`, borderRadius: 8, padding: "8px 12px" })
+    },
+    "+ Add fixture (e.g. 3rd place)"
+  )), tab === "stats" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, textTransform: "uppercase", letterSpacing: 2, marginTop: 4 }) }, "Tournament form"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: -12 } }, "Every match analysed individually, as of ", STATS_ASOF, ". Per-match xG from the RealGM tracker; player goals from the official Golden Boot standings. Win % is the market's chance of winning the QF including penalties."), Object.entries(TEAM_STATS).map(([name, st]) => /* @__PURE__ */ React.createElement(Card, { key: name }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 700, textTransform: "uppercase" }) }, flag(name), " ", name), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 22, fontWeight: 800, color: st.prob >= 50 ? C.live : C.coin, lineHeight: 1 }) }, st.prob, "%"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim } }, "QF win"))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "2px 0 8px" } }, st.group), /* @__PURE__ */ React.createElement(FormPills, { name, size: 28 }), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 gap-2 mt-3" }, [
+    ["Goals for", st.gf, `${(st.gf / 5).toFixed(1)}/game`],
+    ["Goals against", st.ga, `${(st.ga / 5).toFixed(1)}/game`],
+    ["Clean sheets", st.cs, "of 5"],
+    ["xG for", st.xg.toFixed(2), "per game"],
+    ["xG against", st.xga.toFixed(2), "per game"],
+    ["xG diff", st.xgd, "per game"]
+  ].map(([l, v, sub]) => /* @__PURE__ */ React.createElement("div", { key: l, style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "6px 8px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, l), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 19, fontWeight: 800, color: C.chalk, lineHeight: 1.1 }) }, v), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim } }, sub)))), st.players && st.players.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 } }, "Key players"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, st.players.map((p) => /* @__PURE__ */ React.createElement("div", { key: p.n, className: "flex items-center gap-2", style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "4px 10px 4px 4px" } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { teamName: name, num: p.num, name: p.n, size: 30 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: C.chalk } }, p.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.coin } }, p.g, " goals", p.a ? ` · ${p.a} assists` : "")))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 } }, "Last 5 analysed"), st.form.map((m, i) => {
+    const d = m.xg - m.xga;
+    const verdict = m.r === "W" ? d >= 0.7 ? ["Dominant", C.live] : d >= 0.2 ? ["Deserved", C.live] : d > -0.2 ? ["Edged it", C.coin] : ["Against the run of play", C.out] : m.r === "D" ? m.pens ? ["Through on pens", C.coin] : ["Tight", C.coin] : d >= 0.2 ? ["Unlucky", C.coin] : ["Beaten fairly", C.out];
+    const maxBar = 4;
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderTop: `1px solid ${C.line}`, padding: "8px 0" } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { width: 20, height: 20, lineHeight: "20px", borderRadius: "50%", textAlign: "center", fontSize: 11, fontWeight: 700, color: C.ink, background: formColor(m.r) }) }, m.r), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 15, fontWeight: 700 }) }, m.s), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "v ", m.o, m.pens ? " (pens)" : ""), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 10, fontWeight: 600, color: verdict[1], border: `1px solid ${verdict[1]}55`, borderRadius: 999, padding: "2px 8px" } }, verdict[0])), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mt-1", style: { fontSize: 10, color: C.chalkDim } }, /* @__PURE__ */ React.createElement("span", { style: { width: 44 } }, "xG ", m.xg.toFixed(2)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 5, borderRadius: 3, background: C.night, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, m.xg / maxBar * 100) + "%", height: "100%", background: C.live } }))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2", style: { fontSize: 10, color: C.chalkDim, marginTop: 2 } }, /* @__PURE__ */ React.createElement("span", { style: { width: 44 } }, "xGA ", m.xga.toFixed(2)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 5, borderRadius: 3, background: C.night, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, m.xga / maxBar * 100) + "%", height: "100%", background: C.out } }))), m.note && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: 4, fontStyle: "italic" } }, m.note));
+  })), /* @__PURE__ */ React.createElement("div", { style: { height: 6, borderRadius: 3, background: C.night, border: `1px solid ${C.line}`, overflow: "hidden", marginTop: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: st.prob + "%", height: "100%", background: `linear-gradient(90deg, ${C.coinDeep}, ${C.coin})` } }))))), tab === "value" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(ValueCalc, { S }), /* @__PURE__ */ React.createElement(Portfolio, { league, bets, me, S, betReturn, pickLabel, oName })), tab === "table" && /* @__PURE__ */ React.createElement(Card, { style: { padding: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement(H, null, "Standings"), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => copyText(standingsText(), "Standings copied, paste into WhatsApp"),
+      style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 600, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "5px 12px" })
+    },
+    "Copy for WhatsApp"
+  )), rows.map((r, i) => {
+    const prize = i === 0 ? `A$${S.prize1}` : i === 1 ? `A$${S.prize2}` : i === 2 ? `A$${S.prize3}` : null;
+    const myBets = bets.filter((b) => b.ownerId === r.o.id);
+    return /* @__PURE__ */ React.createElement("div", { key: r.o.id, className: "flex items-center gap-3", style: { padding: "10px 14px", borderBottom: `1px solid ${C.line}`, background: i === 0 ? C.coin + "14" : "transparent" } }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 18, fontWeight: 800, width: 22, color: i < 3 ? C.coin : C.chalkDim }) }, i + 1), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 17, fontWeight: 700, textTransform: "uppercase" }) }, r.o.num ? `#${r.o.num} ` : "", oName(r.o)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim } }, myBets.length, " bet", myBets.length === 1 ? "" : "s", " · ", r.spent, " staked · ", S.coins - r.spent, " left", !r.o.paidIn && r.o.name.trim() ? /* @__PURE__ */ React.createElement("span", { style: { color: C.out } }, " · owes A$", S.buyIn) : "")), prize && /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, body), { fontSize: 11, fontWeight: 600, color: C.ink, background: C.coin, borderRadius: 999, padding: "3px 8px" }) }, prize), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 24, fontWeight: 800, color: C.coin }) }, r.pts));
+  }), /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", fontSize: 11, color: C.chalkDim } }, "Points are settled returns (stake × odds). Ties break by fewer coins spent.")), tab === "table" && bets.length > 0 && /* @__PURE__ */ React.createElement(Card, { style: { padding: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement(H, null, "Bet ledger"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim } }, "Every bet in the league, permanent record. Newest first.")), [...bets].sort((a, b) => (b.t || 0) - (a.t || 0)).map((b) => {
+    const f = league.fixtures.find((x) => x.id === b.matchId);
+    const o = league.owners.find((x) => x.id === b.ownerId);
+    const settled = f && f.settled;
+    const ret = betReturn(b);
+    return /* @__PURE__ */ React.createElement("div", { key: b.id, className: "flex items-center gap-2", style: { padding: "8px 14px", borderBottom: `1px solid ${C.line}`, fontSize: 12 } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("b", null, oName(o)), " · ", b.stake, " on ", pickLabel(b), " @ ", fmtOdds(b.odds), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " · ", f ? `${f.home} v ${f.away}` : "removed fixture", " · ", marketLabel(b.market), b.t ? ` · ${new Date(b.t).toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}` : "")), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, whiteSpace: "nowrap", color: settled ? ret > 0 ? C.live : C.out : C.coin }) }, settled ? ret > 0 ? `+${ret}` : "lost" : "open"));
+  })), tab === "rules" && /* @__PURE__ */ React.createElement(Card, { style: { borderColor: C.coinDeep, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.coinDeep}, ${C.coin}, ${C.coinDeep})` } }), /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between", style: { marginTop: 6 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 26, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }) }, "Official Rules"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, marginBottom: 12 } }, "World Cup 2026 Coin Book")), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => copyText(rulesText(), "Rules copied, paste into WhatsApp"),
+      style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 600, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "5px 12px", whiteSpace: "nowrap" })
+    },
+    "Copy for WhatsApp"
+  )), [
+    ["1 · The stake", `${league.owners.length} players × A$${S.buyIn} = A$${pool} prize pool. A$${S.prize1} first, A$${S.prize2} second, A$${S.prize3} third. Coins are play money: no other real money changes hands, ever.`],
+    ["2 · Your coins", `${S.coins} coins total from the quarterfinals to the Final. Round caps: QF max ${S.capQF}, SF max ${S.capSF}, Final max ${S.capFinal}. The caps add to ${S.capQF + S.capSF + S.capFinal}, more than your ${S.coins}, so you cannot max every round. Losing stakes are gone for good; winning stakes do not come back as coins either, they pay points.`],
+    ["3 · Three markets", "Every match offers Winner (who advances, penalties included), Correct Score (the scoreline at the end of play, extra time included, before any shootout), and Anytime Goalscorer (player scores at any point in normal or extra time; shootout kicks do not count, own goals do not count). One bet per market per match, so up to three bets per game. Odds are locked at the moment you place the bet, even if admin later moves the price."],
+    ["4 · Returns", "A winning bet pays stake × odds as points when the match is settled. Points decide the league; coins are only ammunition."],
+    ["Scenario A · Winner bet", `You put 10 coins on Spain at 1.41. Spain win 1-0: you bank 14.1 points. Spain lose: you bank nothing and the 10 coins are gone. If it finishes 1-1 and Spain win the shootout, the Winner market still pays: 14.1 points.`],
+    ["Scenario B · Correct score", `You put 5 coins on 2-1 at around 9.5. Argentina win 2-1 in 90 minutes: 47.5 points. Argentina win 2-1 after extra time: still pays, the score at the end of play is what counts. Argentina draw 1-1 and win on pens: the winning correct score that night is 1-1, not 2-1, so your bet loses.`],
+    ["Scenario C · Goalscorer", `You put 8 coins on Haaland anytime at 2.00. He scores in the 90th minute: 16 points. He scores twice: still 16 points, anytime pays once. He only converts in the penalty shootout: no payout. Norway lose 1-2 but Haaland scores their goal: pays in full, the result does not matter for this market.`],
+    ["Scenario D · Budgeting the caps", `Spend all ${S.capQF} in the QFs and all ${S.capSF} in the semis, and you arrive at the Final with only ${S.coins - S.capQF - S.capSF} coins of your ${S.coins} for a round that allows ${S.capFinal}. The player who banks points early AND saves powder for the Final usually wins this format.`],
+    ["Scenario E · Changing your mind", "All bets can be pulled or replaced any time before kickoff: the coins return to your budget instantly. At kickoff every market on that match locks automatically and the board is final. Every placed and pulled bet is timestamped in the public log, so late edits are visible to all."],
+    ["Scenario F · Ties and disputes", `If two players finish level on points, fewer coins spent wins the tiebreak (efficiency beats volume). Admin actions require a PIN and every admin change, odds edits, results, locks, appears in the log for everyone to audit. The admin's settlement decision is final; appeals accepted in the group chat with supporting evidence and a meme.`]
+  ].map(([h, t]) => /* @__PURE__ */ React.createElement("div", { key: h, style: { borderTop: `1px solid ${C.line}`, padding: "10px 0" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 16, fontWeight: 700, textTransform: "uppercase", color: C.coin }) }, h), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, lineHeight: 1.55, marginTop: 2 } }, t)))), tab === "log" && /* @__PURE__ */ React.createElement(Card, { style: { padding: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", borderBottom: `1px solid ${C.line}`, display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement(H, null, "Change log"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalkDim } }, "stored separately · last ", Math.min(log.length, 150), " events")), log.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: 14, fontSize: 13, color: C.chalkDim } }, "Nothing yet. Bets, pulled bets, and settled results land here automatically with timestamps."), log.map((e, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "9px 14px", borderBottom: `1px solid ${C.line}`, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 11, marginRight: 8 } }, new Date(e.t).toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })), e.msg)))));
+}
+function ValueCalc({ S }) {
+  const [odds, setOdds] = useState(2);
+  const [prob, setProb] = useState(50);
+  const [stake, setStake] = useState(10);
+  const ret = round1(stake * odds);
+  const ev = round1(prob / 100 * stake * odds);
+  const edge = prob / 100 * odds - 1;
+  return /* @__PURE__ */ React.createElement(Card, { style: { borderColor: C.coinDeep } }, /* @__PURE__ */ React.createElement(H, { color: C.coin }, "Value calculator"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "2px 0 10px" } }, "Enter any market's odds, your own probability, and a stake. Positive edge means the odds pay more than your model says they should."), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, "Odds", /* @__PURE__ */ React.createElement("input", { type: "number", min: "1.01", step: "0.05", value: odds, onChange: (e) => setOdds(Math.max(1.01, Number(e.target.value) || 1.01)), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) })), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, "Your win %", /* @__PURE__ */ React.createElement("input", { type: "number", min: "0", max: "100", value: prob, onChange: (e) => setProb(Math.max(0, Math.min(100, Number(e.target.value) || 0))), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) })), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, "Stake (coins)", /* @__PURE__ */ React.createElement("input", { type: "number", min: "1", value: stake, onChange: (e) => setStake(Number(e.target.value) || 0), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) }))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 gap-3 mt-3" }, [["Returns if it lands", ret + " pts", C.chalk], ["Expected points", ev + " pts", ev >= stake ? C.live : C.coin], ["Your edge", (edge >= 0 ? "+" : "") + Math.round(edge * 100) + "%", edge >= 0 ? C.live : C.out]].map(([l, v, col]) => /* @__PURE__ */ React.createElement("div", { key: l, style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "8px 10px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, l), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, color: col }) }, v)))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: 8 } }, "Correct score odds in the app come from a Poisson model of each side's goal rate; the market probabilities on the form cards below are good starting inputs here."));
+}
+function Portfolio({ league, bets, me, S, betReturn, pickLabel, oName }) {
+  const [probs, setProbs] = useState({});
+  const fxById = (id) => league.fixtures.find((f) => f.id === id);
+  const capFor = (r) => r === "QF" ? S.capQF : r === "SF" ? S.capSF : S.capFinal;
+  if (!me) return /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.chalkDim } }, "Pick who you are in the header to analyse your bets."));
+  const mine = bets.filter((b) => b.ownerId === me);
+  const probOf = (b) => probs[b.id] !== void 0 ? probs[b.id] : Math.min(99, Math.round(100 / b.odds));
+  const roundRows = ROUNDS.map((r) => {
+    const rb = mine.filter((b) => {
+      const f = fxById(b.matchId);
+      return f && f.round === r;
+    });
+    const staked = rb.reduce((s, b) => s + b.stake, 0);
+    const potential = round1(rb.reduce((s, b) => s + b.stake * b.odds, 0));
+    const expected = round1(rb.reduce((s, b) => s + probOf(b) / 100 * b.stake * b.odds, 0));
+    const settledPts = round1(rb.reduce((s, b) => s + betReturn(b), 0));
+    return { r, rb, staked, potential, expected, settledPts };
+  });
+  const totStaked = mine.reduce((s, b) => s + b.stake, 0);
+  const totExpected = round1(roundRows.reduce((s, x) => s + x.expected, 0));
+  return /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement(H, { color: C.coin }, "My portfolio"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "2px 0 10px" } }, "Every bet across the three rounds. Adjust the win % on open bets to your own numbers: expected points and edge update live. Implied % (from the odds) is the default."), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-3 gap-2", style: { marginBottom: 10 } }, roundRows.map(({ r, staked }) => /* @__PURE__ */ React.createElement("div", { key: r, style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "6px 8px" } }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { fontSize: 10, color: C.chalkDim, letterSpacing: 1, textTransform: "uppercase" } }, /* @__PURE__ */ React.createElement("span", null, r), /* @__PURE__ */ React.createElement("span", { style: { color: staked > capFor(r) ? C.out : C.coin } }, staked, "/", capFor(r))), /* @__PURE__ */ React.createElement("div", { style: { height: 5, borderRadius: 3, background: C.card, overflow: "hidden", marginTop: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, staked / capFor(r) * 100) + "%", height: "100%", background: `linear-gradient(90deg, ${C.coinDeep}, ${C.coin})` } }))))), mine.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.chalkDim } }, "No bets yet. Head to the Bets screen."), roundRows.map(({ r, rb, staked, potential, expected, settledPts }) => rb.length > 0 && /* @__PURE__ */ React.createElement("div", { key: r, style: { borderTop: `1px solid ${C.line}`, paddingTop: 8, marginTop: 8 } }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { fontSize: 11, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 } }, /* @__PURE__ */ React.createElement("span", null, r === "QF" ? "Quarterfinals" : r === "SF" ? "Semifinals" : "Final"), /* @__PURE__ */ React.createElement("span", null, staked, " staked · potential ", potential, " · exp ", expected, settledPts > 0 ? ` · banked ${settledPts}` : "")), rb.map((b) => {
+    const f = fxById(b.matchId);
+    const settled = f && f.settled;
+    const ret = betReturn(b);
+    const p = probOf(b);
+    const ev = round1(p / 100 * b.stake * b.odds);
+    const edge = Math.round(p / 100 * b.odds * 100 - 100);
+    return /* @__PURE__ */ React.createElement("div", { key: b.id, className: "flex items-center gap-2", style: { fontSize: 12, padding: "4px 0", flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, minWidth: 130 } }, /* @__PURE__ */ React.createElement("b", null, pickLabel(b)), " @ ", fmtOdds(b.odds), " · ", b.stake, " coins", /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " · ", f ? `${f.home} v ${f.away}` : "", " (", marketLabel(b.market), ")")), settled ? /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, color: ret > 0 ? C.live : C.out }) }, ret > 0 ? `won +${ret}` : "lost") : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "number",
+        min: "1",
+        max: "99",
+        value: p,
+        onChange: (e) => setProbs(__spreadProps(__spreadValues({}, probs), { [b.id]: Math.max(1, Math.min(99, Number(e.target.value) || 1)) })),
+        style: __spreadProps(__spreadValues({}, inputStyle), { width: 58, padding: "3px 6px", fontSize: 12 })
+      }
+    ), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, color: C.chalkDim } }, "win %"), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, minWidth: 62, textAlign: "right", color: edge >= 0 ? C.live : C.out }) }, ev, " pts (", edge >= 0 ? "+" : "", edge, "%)")));
+  }))), mine.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { borderTop: `1px solid ${C.line}`, marginTop: 8, paddingTop: 8, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", null, "Total: ", totStaked, " of ", S.coins, " coins deployed"), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, color: C.coin }) }, "expected ", totExpected, " pts")));
+}
+function FixtureCard({ fx, status, league, bets, me, S, oName, betReturn, pickLabel, requireAdmin, appendLog, placeBet, pullBet, setFixture, settleFixture, maxStake }) {
+  const [market, setMarket] = useState("winner");
+  const [pick, setPick] = useState("");
+  const [stake, setStake] = useState(10);
+  const [admin, setAdmin] = useState(false);
+  const [newScorer, setNewScorer] = useState({ name: "", team: "home", odds: 3, num: 0 });
+  const fxBets = bets.filter((b) => b.matchId === fx.id);
+  const myBets = fxBets.filter((b) => b.ownerId === me);
+  const myBetFor = (m) => myBets.find((b) => b.market === m);
+  const statusColor = status === "open" ? C.live : status === "locked" ? C.coin : C.chalkDim;
+  const currentOdds = () => {
+    if (market === "winner") return pick === "home" ? fx.oddsH : pick === "away" ? fx.oddsA : 0;
+    if (market === "score") {
+      if (!pick) return 0;
+      const [h, a] = pick.split("-").map(Number);
+      const p = scoreProb(h, a, fx.lh, fx.la);
+      return p > 0 ? Math.max(1.01, 1 / p) : 999;
+    }
+    const sc = fx.scorers.find((s) => s.id === pick);
+    return sc ? sc.odds : 0;
+  };
+  const odds = currentOdds();
+  const OddsBtn = ({ selected, onClick, top, bottom, wide }) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick,
+      style: {
+        flex: wide ? 1 : "none",
+        minWidth: wide ? 0 : 58,
+        padding: "6px 4px",
+        borderRadius: 8,
+        textAlign: "center",
+        border: `1px solid ${selected ? C.coin : C.line}`,
+        background: selected ? C.coin + "22" : C.night,
+        color: C.chalk
+      }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, body), { fontSize: 11, color: selected ? C.coin : C.chalkDim, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }) }, top),
+    /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 17, fontWeight: 800, color: selected ? C.coin : C.chalk }) }, bottom)
+  );
+  return /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 13, fontWeight: 700, letterSpacing: 2, color: C.coin }) }, fx.label), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 600, color: statusColor, textTransform: "uppercase", letterSpacing: 1 } }, status)), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 24, fontWeight: 800, textTransform: "uppercase", marginTop: 4 }) }, flag(fx.home), " ", fx.home, " ", /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 16 } }, "v"), " ", fx.away, " ", flag(fx.away)), (TEAM_STATS[fx.home] || TEAM_STATS[fx.away]) && !fx.settled && /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 mt-1 flex-wrap", style: { fontSize: 10, color: C.chalkDim } }, /* @__PURE__ */ React.createElement(FormPills, { name: fx.home, size: 18 }), /* @__PURE__ */ React.createElement("span", { style: { letterSpacing: 1 } }, "FORM"), /* @__PURE__ */ React.createElement(FormPills, { name: fx.away, size: 18 })), fx.settled && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.live, marginTop: 2 } }, "Full time ", fx.resultH, "-", fx.resultA, " · ", fx.winner === "home" ? fx.home : fx.away, " through", fx.scorers.filter((s) => s.scored).length > 0 && /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " · scorers: ", fx.scorers.filter((s) => s.scored).map((s) => s.name).join(", "))), status === "open" && me && /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 10, paddingTop: 10 } }, /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, MARKETS.map(([k, label]) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: k,
+      onClick: () => {
+        setMarket(k);
+        setPick("");
+      },
+      style: __spreadProps(__spreadValues({
+        flex: 1
+      }, body), {
+        fontSize: 12,
+        fontWeight: 600,
+        padding: "6px 0",
+        borderRadius: 8,
+        border: `1px solid ${market === k ? C.coin : C.line}`,
+        background: market === k ? C.coin + "22" : "transparent",
+        color: market === k ? C.coin : C.chalkDim
+      })
+    },
+    label,
+    myBetFor(k) ? " ●" : ""
+  ))), myBetFor(market) ? /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mt-3" }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13 } }, "Your ", marketLabel(market), " bet: ", /* @__PURE__ */ React.createElement("b", { style: { color: C.coin } }, myBetFor(market).stake, " coins"), " on ", pickLabel(myBetFor(market)), " @ ", fmtOdds(myBetFor(market).odds), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " · returns ", round1(myBetFor(market).stake * myBetFor(market).odds), " pts")), /* @__PURE__ */ React.createElement("button", { onClick: () => pullBet(fx, market), style: { fontSize: 12, color: C.out, background: "transparent", border: `1px solid ${C.out}55`, borderRadius: 8, padding: "3px 10px", whiteSpace: "nowrap" } }, "Pull bet")) : /* @__PURE__ */ React.createElement(React.Fragment, null, market === "winner" && /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-3" }, /* @__PURE__ */ React.createElement(OddsBtn, { wide: true, selected: pick === "home", onClick: () => setPick("home"), top: `${flag(fx.home)} ${fx.home}`, bottom: fmtOdds(fx.oddsH) }), /* @__PURE__ */ React.createElement(OddsBtn, { wide: true, selected: pick === "away", onClick: () => setPick("away"), top: `${flag(fx.away)} ${fx.away}`, bottom: fmtOdds(fx.oddsA) })), market === "score" && /* @__PURE__ */ React.createElement("div", { className: "overflow-x-auto mt-3", style: { paddingBottom: 4 } }, [0, 1, 2, 3, 4].map((h) => /* @__PURE__ */ React.createElement("div", { key: h, className: "flex gap-1", style: { marginBottom: 4 } }, [0, 1, 2, 3, 4].map((a) => {
+    const key = `${h}-${a}`;
+    const o = Math.max(1.01, 1 / Math.max(scoreProb(h, a, fx.lh, fx.la), 1e-4));
+    return /* @__PURE__ */ React.createElement(OddsBtn, { key, selected: pick === key, onClick: () => setPick(key), top: key, bottom: fmtOdds(o) });
+  }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim } }, "Poisson odds, goal rates blended from tournament xG: ", fx.home, " ", fx.lh, ", ", fx.away, " ", fx.la, " per game. Rows are ", fx.home, " goals.")), market === "scorer" && /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mt-3" }, fx.scorers.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "No scorer list yet: admin can add players below."), fx.scorers.map((s) => {
+    const tn = s.team === "home" ? fx.home : fx.away;
+    const sel = pick === s.id;
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: s.id,
+        onClick: () => setPick(s.id),
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 8px",
+          borderRadius: 10,
+          textAlign: "left",
+          border: `1px solid ${sel ? C.coin : C.line}`,
+          background: sel ? C.cardHi : C.night
+        }
+      },
+      /* @__PURE__ */ React.createElement(PlayerAvatar, { teamName: tn, num: s.num, name: s.name, size: 38 }),
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 700, color: C.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }) }, s.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim } }, flag(tn), " ", tn)),
+      /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 16, color: sel ? C.coinDeep : C.ink }) }, fmtOdds(s.odds))
+    );
+  })), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mt-3 flex-wrap" }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "Stake"), /* @__PURE__ */ React.createElement("input", { type: "number", min: "1", value: stake, onChange: (e) => setStake(Number(e.target.value) || 0), style: __spreadProps(__spreadValues({}, inputStyle), { width: 76 }) }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: stake > maxStake ? C.out : C.chalkDim } }, "max ", Math.max(0, maxStake)), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: "auto", textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, "Returns"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, color: pick ? C.live : C.chalkDim, lineHeight: 1 }) }, pick && odds ? round1(stake * odds) + " pts" : "pick one")), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => placeBet(fx, market, pick, odds, stake),
+      disabled: !pick,
+      style: __spreadProps(__spreadValues({}, display), { fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: pick ? C.coin : C.line, border: "none", borderRadius: 8, padding: "8px 14px" })
+    },
+    "Place bet"
+  )))), fxBets.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 10, paddingTop: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 } }, "Bets in"), fxBets.map((b) => {
+    const o = league.owners.find((x) => x.id === b.ownerId);
+    const ret = betReturn(b);
+    return /* @__PURE__ */ React.createElement("div", { key: b.id, className: "flex justify-between gap-2", style: { fontSize: 13, padding: "2px 0" } }, /* @__PURE__ */ React.createElement("span", { style: { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, oName(o), " · ", b.stake, " on ", pickLabel(b), " @ ", fmtOdds(b.odds), " ", /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, "(", marketLabel(b.market), ")")), fx.settled ? /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, color: ret > 0 ? C.live : C.out, whiteSpace: "nowrap" }) }, ret > 0 ? `+${ret} pts` : "0 pts") : /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontWeight: 700, color: C.coin, whiteSpace: "nowrap" }) }, "→ ", round1(b.stake * b.odds)));
+  })), !fx.settled && /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 10, paddingTop: 8 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    if (admin) setAdmin(false);
+    else if (requireAdmin()) setAdmin(true);
+  }, style: { fontSize: 11, color: C.chalkDim, background: "transparent", border: "none", textDecoration: "underline" } }, admin ? "Hide admin" : "🔒 Admin: odds / result"), admin && /* @__PURE__ */ React.createElement("div", { className: "flex flex-col gap-2 mt-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("input", { value: fx.home, onChange: (e) => setFixture(fx.id, { home: e.target.value }), onBlur: () => appendLog(`Admin set home team to ${fx.home}`), style: inputStyle, placeholder: "Home" }), /* @__PURE__ */ React.createElement("input", { value: fx.away, onChange: (e) => setFixture(fx.id, { away: e.target.value }), onBlur: () => appendLog(`Admin set away team to ${fx.away}`), style: inputStyle, placeholder: "Away" })), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("input", { value: fx.label, onChange: (e) => setFixture(fx.id, { label: e.target.value }), style: inputStyle, placeholder: "Kickoff label" }), /* @__PURE__ */ React.createElement("select", { value: fx.round, onChange: (e) => setFixture(fx.id, { round: e.target.value }), style: __spreadProps(__spreadValues({}, inputStyle), { width: 100 }) }, ROUNDS.map((r) => /* @__PURE__ */ React.createElement("option", { key: r }, r)))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, fx.home, " win odds", /* @__PURE__ */ React.createElement("input", { type: "number", step: "0.01", min: "1.01", value: fx.oddsH, onChange: (e) => setFixture(fx.id, { oddsH: Number(e.target.value) || 1.9 }), onBlur: () => appendLog(`Admin set ${fx.home} win odds to ${fx.oddsH}`), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) })), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, fx.away, " win odds", /* @__PURE__ */ React.createElement("input", { type: "number", step: "0.01", min: "1.01", value: fx.oddsA, onChange: (e) => setFixture(fx.id, { oddsA: Number(e.target.value) || 1.9 }), onBlur: () => appendLog(`Admin set ${fx.away} win odds to ${fx.oddsA}`), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) })), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, fx.home, " goals per game", /* @__PURE__ */ React.createElement("input", { type: "number", step: "0.1", min: "0.1", value: fx.lh, onChange: (e) => setFixture(fx.id, { lh: Number(e.target.value) || 1 }), onBlur: () => appendLog(`Admin set ${fx.home} goal rate to ${fx.lh}`), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) })), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 11, color: C.chalkDim } }, fx.away, " goals per game", /* @__PURE__ */ React.createElement("input", { type: "number", step: "0.1", min: "0.1", value: fx.la, onChange: (e) => setFixture(fx.id, { la: Number(e.target.value) || 1 }), onBlur: () => appendLog(`Admin set ${fx.away} goal rate to ${fx.la}`), style: __spreadProps(__spreadValues({}, inputStyle), { marginTop: 4 }) }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginTop: 4 } }, "Goalscorer market"), fx.scorers.map((s) => /* @__PURE__ */ React.createElement("div", { key: s.id, className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement(PlayerAvatar, { teamName: s.team === "home" ? fx.home : fx.away, num: s.num, name: s.name, size: 26 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, s.name, " @ ", fmtOdds(s.odds)), /* @__PURE__ */ React.createElement(Chip, { on: s.scored, color: C.live, onClick: () => {
+    setFixture(fx.id, { scorers: fx.scorers.map((x) => x.id === s.id ? __spreadProps(__spreadValues({}, x), { scored: !x.scored }) : x) });
+    appendLog(`Admin marked ${s.name} as ${!s.scored ? "scored" : "not scored"} (${fx.home} v ${fx.away})`);
+  } }, "Scored"), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => {
+        setFixture(fx.id, { scorers: fx.scorers.filter((x) => x.id !== s.id) });
+        appendLog(`Admin removed ${s.name} from the scorer market`);
+      },
+      style: { fontSize: 12, color: C.out, background: "transparent", border: "none" }
+    },
+    "✕"
+  ))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement("input", { value: newScorer.name, placeholder: "Player", onChange: (e) => setNewScorer(__spreadProps(__spreadValues({}, newScorer), { name: e.target.value })), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }), /* @__PURE__ */ React.createElement("select", { value: newScorer.team, onChange: (e) => setNewScorer(__spreadProps(__spreadValues({}, newScorer), { team: e.target.value })), style: __spreadProps(__spreadValues({}, inputStyle), { width: 92 }) }, /* @__PURE__ */ React.createElement("option", { value: "home" }, fx.home), /* @__PURE__ */ React.createElement("option", { value: "away" }, fx.away)), /* @__PURE__ */ React.createElement("input", { type: "number", step: "0.1", min: "1.01", value: newScorer.odds, onChange: (e) => setNewScorer(__spreadProps(__spreadValues({}, newScorer), { odds: Number(e.target.value) || 2 })), style: __spreadProps(__spreadValues({}, inputStyle), { width: 64 }), title: "Odds" }), /* @__PURE__ */ React.createElement("input", { type: "number", min: "0", max: "99", value: newScorer.num || "", placeholder: "#", onChange: (e) => setNewScorer(__spreadProps(__spreadValues({}, newScorer), { num: Number(e.target.value) || 0 })), style: __spreadProps(__spreadValues({}, inputStyle), { width: 50 }), title: "Shirt number" }), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => {
+        if (newScorer.name.trim()) {
+          setFixture(fx.id, { scorers: [...fx.scorers, { id: uid(), name: newScorer.name.trim(), team: newScorer.team, odds: newScorer.odds, num: newScorer.num || 0, scored: false }] });
+          appendLog(`Admin added ${newScorer.name.trim()} @ ${newScorer.odds} to the scorer market (${fx.home} v ${fx.away})`);
+          setNewScorer({ name: "", team: "home", odds: 3, num: 0 });
+        }
+      },
+      style: __spreadProps(__spreadValues({}, body), { fontSize: 12, fontWeight: 600, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "0 12px" })
+    },
+    "Add"
+  )), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 flex-wrap", style: { marginTop: 4 } }, /* @__PURE__ */ React.createElement(Chip, { on: fx.locked, color: C.coin, onClick: () => {
+    setFixture(fx.id, { locked: !fx.locked });
+    appendLog(`Admin ${!fx.locked ? "locked" : "reopened"} betting on ${fx.home} v ${fx.away}`);
+  } }, "Lock betting"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "Score"), /* @__PURE__ */ React.createElement(Step, { value: fx.resultH, onChange: (v) => setFixture(fx.id, { resultH: v }) }), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, "-"), /* @__PURE__ */ React.createElement(Step, { value: fx.resultA, onChange: (v) => setFixture(fx.id, { resultA: v }) })), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("select", { value: fx.winner, onChange: (e) => setFixture(fx.id, { winner: e.target.value }), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Winner (incl. pens)…"), /* @__PURE__ */ React.createElement("option", { value: "home" }, fx.home), /* @__PURE__ */ React.createElement("option", { value: "away" }, fx.away)), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => settleFixture(fx),
+      style: __spreadProps(__spreadValues({}, display), { fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.live, border: "none", borderRadius: 8, padding: "7px 14px" })
+    },
+    "Settle"
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim } }, 'Tick "Scored" for each listed player who scored before settling: correct score and winner settle from the score and winner fields.'))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
