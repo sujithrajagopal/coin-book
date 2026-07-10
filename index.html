@@ -840,7 +840,7 @@ function App() {
       await window.storage.set(K_ME, target.id);
     } catch (e) {
     }
-    flash(`Welcome, ${nm}: saved`);
+    flash(`Vaa ${nm}, nee varuvaenu theriyum 😎`);
   };
   const nextOpen = league.fixtures.filter((f) => fxStatus(f) === "open").sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
   const fmtLeft = (ms) => {
@@ -1004,7 +1004,12 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     appendLog(`${who} confirmed ${live.length} bet${live.length === 1 ? "" : "s"} (picks sealed until kickoff)`);
     setSlip([]);
     setSlipOpen(false);
-    flash(`${live.length} bet${live.length === 1 ? "" : "s"} confirmed`);
+    const confirmMemes = [
+      `Naan oru dhadava sonna, nooru dhadava sonna madhiri: ${live.length} bet${live.length === 1 ? "" : "s"} locked 🔒`,
+      `${live.length} bet${live.length === 1 ? "" : "s"} confirmed. En vazhi, thani vazhi 😤`,
+      `${live.length} bet${live.length === 1 ? "" : "s"} in. Ini ellam vidhi kai la ✋`
+    ];
+    flash(confirmMemes[Date.now() % 3]);
   };
   const settleFixture = async (fx) => {
     if (!fx.winner) {
@@ -1129,7 +1134,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
         } catch (e) {
         }
         appendLog(`${o.name.trim() || `Player ${i + 1}`} joined on a device`);
-        flash(`Welcome, ${o.name.trim() || `Player ${i + 1}`}`);
+        flash(`Vaa ${o.name.trim() || `Player ${i + 1}`}, nee varuvaenu theriyum 😎`);
       },
       style: __spreadProps(__spreadValues({}, display), { fontSize: 15, fontWeight: 700, textTransform: "uppercase", padding: "12px 4px", borderRadius: 10, border: `1px solid ${C.line}`, background: C.card, color: C.chalk })
     },
@@ -1307,6 +1312,18 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       if (best && betReturn(best) >= 40) P.push(`That +${betReturn(best)} banger is doing all the heavy lifting.`);
       if (i === 0 && r.pts > 0) P.push("Wearing the crown. Seven people below are aiming at the same head.");
       if (i === rows.length - 1 && r.pts >= 0 && settledB.length > 0) P.push("Propping up the table, which is technically also a position.");
+      if (i === 0 && r.pts > 0) P.push("தலைவர். Mass ah irukku. Everyone else is watching from the gallery.");
+      if (wins.length >= 3 && losses === 0) P.push("Vera level form. Book-ku konjam bayama irukku.");
+      if (losses >= 3 && wins.length === 0) P.push("Aiyo... coins ellam thanni la. Comeback story loading?");
+      if (avgOdds >= 6) P.push("Full adhirshtam route: one big odds hit and it's 'naan sonnen la' time in the group.");
+      if (left >= 60 && allB.length > 0) P.push("Coins ellam save pannirukaaru: climax scene ku ready aagitaru.");
+      if (inPlay >= 80) P.push(`Innum ${inPlay} points oatathula irukku: oru nalla naal, table thalai keezh.`);
+      if (i === rows.length - 1 && settledB.length > 0) P.push("Table la last, aana vibe la first.");
+      if (losses >= 2 && wins.length >= 2) P.push("Oru naal raja, oru naal... seri, vidunga.");
+      if (mv >= 2) P.push(`${mv} places mela vandhutaru: silent ah vandhu seat pudichitaru.`);
+      if (best && betReturn(best) >= 40) P.push(`Idhu eppadi irukku! 😎 That +${betReturn(best)} did all the damage.`);
+      if (losses >= 2 && wins.length === 0) P.push("Kashtam... romba kashtam. But heroes always enter in the second half.");
+      if (avgOdds >= 7) P.push("En vazhi, thani vazhi: odds inga yaarum thoda maatanga.");
       if (P.length === 0) P.push("Playing it straight down the middle. No tells yet.");
       const seed = (r.o.id + ":" + settledFx.length).split("").reduce((s2, c) => s2 + c.charCodeAt(0), 0);
       const pundit = P[seed % P.length];
@@ -1318,7 +1335,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
           style: { width: "100%", padding: "11px 14px", background: "transparent", border: "none", textAlign: "left" }
         },
         /* @__PURE__ */ React.createElement("div", { style: { width: 30, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 17, fontWeight: 700, color: i < 3 && r.pts > 0 ? C.coinDeep : C.chalkDim, lineHeight: 1 }) }, i === 0 && r.pts > 0 ? "👑" : i + 1), lastId && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: mv > 0 ? C.live : mv < 0 ? C.out : C.chalkDim } }, mv > 0 ? `▲${mv}` : mv < 0 ? `▼${-mv}` : "–")),
-        /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 16, fontWeight: 700, textTransform: "uppercase", color: C.chalk }) }, r.o.num ? `#${r.o.num} ` : "", oName(r.o)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, settledB.length > 0 ? `${wins.length}W-${settledB.length - wins.length}L` : "no settled bets", best ? ` · best +${betReturn(best)}` : "", " · ", S.coins - r.spent, " coins left", !r.o.paidIn && r.o.name.trim() ? /* @__PURE__ */ React.createElement("span", { style: { color: C.out } }, " · owes A$", S.buyIn) : "")),
+        /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 16, fontWeight: 700, textTransform: "uppercase", color: C.chalk }) }, r.o.num ? `#${r.o.num} ` : "", oName(r.o)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, i === 0 && r.pts > 0 ? /* @__PURE__ */ React.createElement("span", { style: { color: C.coinDeep, fontWeight: 700 } }, "தலைவர் · ") : "", settledB.length > 0 ? `${wins.length}W-${settledB.length - wins.length}L` : "no settled bets", best ? ` · best +${betReturn(best)}` : "", " · ", S.coins - r.spent, " coins left", !r.o.paidIn && r.o.name.trim() ? /* @__PURE__ */ React.createElement("span", { style: { color: C.out } }, " · owes A$", S.buyIn) : "")),
         prize && /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, body), { fontSize: 11, fontWeight: 600, color: C.ink, background: C.coin, borderRadius: 999, padding: "3px 8px", flexShrink: 0 }) }, prize),
         /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 23, fontWeight: 700, color: r.pts > 0 ? C.coinDeep : C.chalkDim, lineHeight: 1 }) }, r.pts), inPlay > 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.live, fontWeight: 600 } }, "+", inPlay, " in play"))
       ), expanded && /* @__PURE__ */ React.createElement("div", { style: { padding: "0 14px 12px 58px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontStyle: "italic", color: C.coinDeep, background: C.cardHi, borderRadius: 8, padding: "7px 10px", marginBottom: 6 } }, "🎙 ", pundit), r.o.note && r.o.note.trim() && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontStyle: "italic", color: C.chalk, borderLeft: `3px solid ${C.coin}`, padding: "4px 10px", marginBottom: 6 } }, r.o.note), settledB.length === 0 && openB.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim } }, "No bets yet."), settledB.map((b) => {
@@ -1371,7 +1388,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       onClick: () => {
         setSlip([]);
         setSlipOpen(false);
-        flash("Slip cleared");
+        flash("Plan maathitom 😅");
       },
       style: __spreadProps(__spreadValues({}, display), { flex: 1, fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.out, background: "transparent", border: `1.5px solid ${C.out}`, borderRadius: 10, padding: "10px 0" })
     },
