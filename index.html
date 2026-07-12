@@ -706,7 +706,10 @@ function App() {
       if (dirty.current) return;
       try {
         const r = await window.storage.get(K_LEAGUE, true);
-        if (r && r.value && r.value !== JSON.stringify(league)) setLeague(JSON.parse(r.value));
+        if (!dirty.current && r && r.value && r.value !== JSON.stringify(leagueRef.current)) {
+          leagueRef.current = JSON.parse(r.value);
+          setLeague(leagueRef.current);
+        }
       } catch (e) {
       }
       try {
@@ -723,7 +726,10 @@ function App() {
       if (dirty.current) return;
       try {
         const r = await window.storage.get(K_LEAGUE, true);
-        if (r && r.value && r.value !== JSON.stringify(leagueRef.current)) setLeague(JSON.parse(r.value));
+        if (!dirty.current && r && r.value && r.value !== JSON.stringify(leagueRef.current)) {
+          leagueRef.current = JSON.parse(r.value);
+          setLeague(leagueRef.current);
+        }
       } catch (e) {
       }
       try {
@@ -754,8 +760,25 @@ function App() {
   }, []);
   const S = league.settings;
   const pool = league.owners.length * S.buyIn;
-  const setOwner = (id, patch) => setLeague((s) => __spreadProps(__spreadValues({}, s), { owners: s.owners.map((o) => o.id === id ? __spreadValues(__spreadValues({}, o), patch) : o) }));
-  const setFixture = (id, patch) => setLeague((s) => __spreadProps(__spreadValues({}, s), { fixtures: s.fixtures.map((f) => f.id === id ? __spreadValues(__spreadValues({}, f), typeof patch === "function" ? patch(f) : patch) : f) }));
+  const writeLeague = (next) => {
+    leagueRef.current = next;
+    setLeague(next);
+    try {
+      window.storage.set(K_LEAGUE, JSON.stringify(next), true).then(() => {
+        dirty.current = false;
+      }).catch(() => {
+      });
+    } catch (e) {
+    }
+  };
+  const setOwner = (id, patch) => {
+    const cur = leagueRef.current;
+    writeLeague(__spreadProps(__spreadValues({}, cur), { owners: cur.owners.map((o) => o.id === id ? __spreadValues(__spreadValues({}, o), patch) : o) }));
+  };
+  const setFixture = (id, patch) => {
+    const cur = leagueRef.current;
+    writeLeague(__spreadProps(__spreadValues({}, cur), { fixtures: cur.fixtures.map((f) => f.id === id ? __spreadValues(__spreadValues({}, f), typeof patch === "function" ? patch(f) : patch) : f) }));
+  };
   const oName = (o) => o && o.name.trim() || (o ? `Player ${league.owners.indexOf(o) + 1}` : "unknown");
   const capFor = (round) => round === "QF" ? S.capQF : round === "SF" ? S.capSF : S.capFinal;
   const fxById = (id) => league.fixtures.find((f) => f.id === id);
