@@ -1346,6 +1346,25 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     setSlipMode("singles");
     flash(`Multi on. ${legs.length} legs, ella match-um jeikanum 🙏`);
   };
+  const restoreQFs = async () => {
+    if (!requireAdmin()) return;
+    const RES = {
+      f1: { rH: 2, rA: 0, w: "home", dec: "90", scorers: ["Mbappe", "Dembele"] },
+      f2: { rH: 2, rA: 1, w: "home", dec: "90", scorers: ["Fabian Ruiz", "De Ketelaere", "Merino"] },
+      f3: { rH: 1, rA: 2, w: "away", dec: "et", scorers: ["Bellingham"] },
+      f4: { rH: 3, rA: 1, w: "home", dec: "et", scorers: ["Mac Allister", "Alvarez", "Lautaro Martinez"] }
+    };
+    let lg = leagueRef.current;
+    lg = __spreadProps(__spreadValues({}, lg), { fixtures: lg.fixtures.map((f) => {
+      const r = RES[f.id];
+      if (!r) return f;
+      const scs = (f.scorers || []).map((s) => __spreadProps(__spreadValues({}, s), { scored: r.scorers.some((n) => s.name.toLowerCase().includes(n.toLowerCase().split(" ").pop())) }));
+      return __spreadProps(__spreadValues({}, f), { settled: true, locked: true, resultH: r.rH, resultA: r.rA, winner: r.w, decided: r.dec, scorers: scs });
+    }) });
+    writeLeague(lg);
+    appendLog("Admin restored the four QF results (scores, winners, scorers)");
+    flash("QFs restored: points recalculating");
+  };
   const settleFixture = async (fx) => {
     if (!fx.winner) {
       flash("Pick the match winner first");
@@ -1442,7 +1461,14 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       onBlur: () => appendLog(`Admin updated the pundit's note for ${o.name || "player " + (i + 1)}`),
       style: __spreadProps(__spreadValues({}, inputStyle), { fontSize: 12, fontStyle: "italic" })
     }
-  ))))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 14, paddingTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 10px", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 } }, "Diagnostic · what the app is reading"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, lineHeight: 1.7 } }, "Storage mode: ", /* @__PURE__ */ React.createElement("b", { style: { color: typeof window !== "undefined" && (window.__storageMode === "cloud" || window.__storageMode === "claude") ? C.live : C.out } }, typeof window !== "undefined" ? window.__storageMode || "?" : "?"), /* @__PURE__ */ React.createElement("br", null), "Settled fixtures: ", /* @__PURE__ */ React.createElement("b", null, league.fixtures.filter((f) => f.settled).length), " of ", league.fixtures.length, " · Total bets: ", /* @__PURE__ */ React.createElement("b", null, bets.length), /* @__PURE__ */ React.createElement("br", null), league.fixtures.filter((f) => f.settled).map((f) => /* @__PURE__ */ React.createElement("span", { key: f.id, style: { color: C.chalkDim } }, f.home, " ", f.resultH, "-", f.resultA, " ", f.away, " · ")), league.fixtures.filter((f) => f.settled).length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: C.out } }, "No settled fixtures in the loaded data. If the live site shows this, the board didn't load from cloud: hard-refresh. If only the preview shows it, the preview isn't connected to Firebase (expected)."))), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
+  ))))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 14, paddingTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 8, padding: "8px 10px", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 } }, "Diagnostic · what the app is reading"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, lineHeight: 1.7 } }, "Storage mode: ", /* @__PURE__ */ React.createElement("b", { style: { color: typeof window !== "undefined" && (window.__storageMode === "cloud" || window.__storageMode === "claude") ? C.live : C.out } }, typeof window !== "undefined" ? window.__storageMode || "?" : "?"), /* @__PURE__ */ React.createElement("br", null), "Settled fixtures: ", /* @__PURE__ */ React.createElement("b", null, league.fixtures.filter((f) => f.settled).length), " of ", league.fixtures.length, " · Total bets: ", /* @__PURE__ */ React.createElement("b", null, bets.length), /* @__PURE__ */ React.createElement("br", null), league.fixtures.filter((f) => f.settled).map((f) => /* @__PURE__ */ React.createElement("span", { key: f.id, style: { color: C.chalkDim } }, f.home, " ", f.resultH, "-", f.resultA, " ", f.away, " · ")), league.fixtures.filter((f) => f.settled).length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: C.out } }, "No settled fixtures in the loaded data.")), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: restoreQFs,
+      style: __spreadProps(__spreadValues({}, display), { marginTop: 8, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "9px 0" })
+    },
+    "↻ Restore the 4 QF results"
+  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies France 2-0, Spain 2-1, England 2-1 (AET), Argentina 3-1 (AET) with correct scorers. Safe to tap: it only sets those four, leaves bets and SFs untouched, and points recompute instantly.")), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => {
