@@ -796,70 +796,86 @@ function App() {
           });
           const looksComplete = lg.owners && lg.owners.length >= 8 && lg.fixtures.filter((f) => f.round === "QF").length >= 4;
           const mkScF = (arr) => arr.map(([name, team, odds, n2]) => ({ id: uid(), name, team, odds, num: n2 || 0, scored: false }));
-          const finalFx = lg.fixtures.find((f) => f.id === "f7");
-          if (finalFx && /finalist|final a|final b|tbd/i.test(finalFx.home + finalFx.away) && !finalFx.settled) {
-            lg = __spreadProps(__spreadValues({}, lg), { fixtures: lg.fixtures.map((f) => f.id === "f7" ? __spreadProps(__spreadValues({}, f), {
-              home: "Spain",
-              away: "Argentina",
-              round: "Final",
-              locked: false,
-              kickoff: "2026-07-19T19:00:00Z",
-              label: "🏆 FINAL · MON 20 JUL, 5:00 AM AEST",
-              oddsH: 2.3,
-              oddsA: 3.1,
-              lh: 1.15,
-              la: 1.25,
-              scorers: f.scorers && f.scorers.length > 0 ? f.scorers : mkScF([
-                ["Oyarzabal", "home", 3.4, 21],
-                ["F. Torres", "home", 3.8, 9],
-                ["Yamal", "home", 3.2, 19],
-                ["N. Williams", "home", 3.9, 17],
-                ["Merino", "home", 5, 6],
-                ["Olmo", "home", 5.5, 10],
-                ["Pedro Porro", "home", 12, 2],
-                ["Fabian Ruiz", "home", 8, 8],
-                ["Messi", "away", 3.3, 10],
-                ["Lautaro Martinez", "away", 3.4, 22],
-                ["J. Alvarez", "away", 3.2, 9],
-                ["E. Fernandez", "away", 6, 24],
-                ["Mac Allister", "away", 5.5, 20],
-                ["Nico Gonzalez", "away", 6.5, 15],
-                ["Almada", "away", 7.5, 21]
-              ])
-            }) : f) });
-            changed = true;
-          }
-          const bronzeFx = lg.fixtures.find((f) => f.id === "f8") || lg.fixtures.find((f) => /3rd|loser/i.test(f.home + f.away + (f.label || "")));
-          if (bronzeFx && !bronzeFx.settled) {
-            lg = __spreadProps(__spreadValues({}, lg), { fixtures: lg.fixtures.map((f) => f.id === bronzeFx.id ? __spreadProps(__spreadValues({}, f), {
-              id: "f8",
-              home: "France",
-              away: "England",
-              round: "Final",
-              locked: false,
-              kickoff: "2026-07-18T21:00:00Z",
-              label: "🥉 3RD PLACE · SUN 19 JUL, 7:00 AM AEST",
-              oddsH: 2.05,
-              oddsA: 3.3,
-              lh: 1.9,
-              la: 1.6,
-              scorers: f.scorers && f.scorers.length > 0 ? f.scorers : mkScF([
-                ["Mbappe", "home", 2.1, 10],
-                ["Dembele", "home", 3, 11],
-                ["Thuram", "home", 3.4, 15],
-                ["Olise", "home", 3.8, 14],
-                ["Barcola", "home", 4.2, 20],
-                ["Coman", "home", 4.5, 26],
-                ["Griezmann", "home", 3.9, 7],
-                ["Kane", "away", 2.9, 9],
-                ["Bellingham", "away", 3.3, 10],
-                ["Saka", "away", 3.8, 7],
-                ["Gordon", "away", 4, 11],
-                ["Foden", "away", 4.5, 22],
-                ["Watkins", "away", 5, 18]
-              ])
-            }) : f) });
-            changed = true;
+          const FINAL_DEF = {
+            id: "f7",
+            home: "Spain",
+            away: "Argentina",
+            round: "Final",
+            locked: false,
+            settled: false,
+            kickoff: "2026-07-19T19:00:00Z",
+            label: "🏆 FINAL · MON 20 JUL, 5:00 AM AEST",
+            oddsH: 2.3,
+            oddsA: 3.1,
+            lh: 1.15,
+            la: 1.25,
+            resultH: 0,
+            resultA: 0,
+            winner: "",
+            decided: "90",
+            scorers: mkScF([
+              ["Oyarzabal", "home", 3.4, 21],
+              ["F. Torres", "home", 3.8, 9],
+              ["Yamal", "home", 3.2, 19],
+              ["N. Williams", "home", 3.9, 17],
+              ["Merino", "home", 5, 6],
+              ["Olmo", "home", 5.5, 10],
+              ["Pedro Porro", "home", 12, 2],
+              ["Fabian Ruiz", "home", 8, 8],
+              ["Messi", "away", 3.3, 10],
+              ["Lautaro Martinez", "away", 3.4, 22],
+              ["J. Alvarez", "away", 3.2, 9],
+              ["E. Fernandez", "away", 6, 24],
+              ["Mac Allister", "away", 5.5, 20],
+              ["Nico Gonzalez", "away", 6.5, 15],
+              ["Almada", "away", 7.5, 21]
+            ])
+          };
+          const BRONZE_DEF = {
+            id: "f8",
+            home: "France",
+            away: "England",
+            round: "Final",
+            locked: false,
+            settled: false,
+            kickoff: "2026-07-18T21:00:00Z",
+            label: "🥉 3RD PLACE · SUN 19 JUL, 7:00 AM AEST",
+            oddsH: 2.05,
+            oddsA: 3.3,
+            lh: 1.9,
+            la: 1.6,
+            resultH: 0,
+            resultA: 0,
+            winner: "",
+            decided: "90",
+            scorers: mkScF([
+              ["Mbappe", "home", 2.1, 10],
+              ["Dembele", "home", 3, 11],
+              ["Thuram", "home", 3.4, 15],
+              ["Olise", "home", 3.8, 14],
+              ["Barcola", "home", 4.2, 20],
+              ["Coman", "home", 4.5, 26],
+              ["Griezmann", "home", 3.9, 7],
+              ["Kane", "away", 2.9, 9],
+              ["Bellingham", "away", 3.3, 10],
+              ["Saka", "away", 3.8, 7],
+              ["Gordon", "away", 4, 11],
+              ["Foden", "away", 4.5, 22],
+              ["Watkins", "away", 5, 18]
+            ])
+          };
+          const isFinalSlot = (f) => f.round === "Final";
+          const finalSlots = lg.fixtures.filter(isFinalSlot);
+          const settledFinals = finalSlots.filter((f) => f.settled);
+          if (settledFinals.length === 0 && finalSlots.length > 0) {
+            const others = lg.fixtures.filter((f) => !isFinalSlot(f));
+            const rebuilt = [...others, __spreadValues({}, FINAL_DEF), __spreadValues({}, BRONZE_DEF)];
+            const cur = JSON.stringify(finalSlots.map((f) => [f.home, f.away, f.id]).sort());
+            const want = JSON.stringify([[FINAL_DEF.home, FINAL_DEF.away, "f7"], [BRONZE_DEF.home, BRONZE_DEF.away, "f8"]].sort());
+            if (cur !== want) {
+              lg = __spreadProps(__spreadValues({}, lg), { fixtures: rebuilt });
+              changed = true;
+            }
           }
           if (changed && looksComplete) {
             try {
