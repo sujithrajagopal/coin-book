@@ -864,15 +864,15 @@ function App() {
               ["Watkins", "away", 5, 18]
             ])
           };
-          const isFinalSlot = (f) => f.round === "Final";
-          const finalSlots = lg.fixtures.filter(isFinalSlot);
-          const settledFinals = finalSlots.filter((f) => f.settled);
-          if (settledFinals.length === 0 && finalSlots.length > 0) {
-            const others = lg.fixtures.filter((f) => !isFinalSlot(f));
-            const rebuilt = [...others, __spreadValues({}, FINAL_DEF), __spreadValues({}, BRONZE_DEF)];
-            const cur = JSON.stringify(finalSlots.map((f) => [f.home, f.away, f.id]).sort());
-            const want = JSON.stringify([[FINAL_DEF.home, FINAL_DEF.away, "f7"], [BRONZE_DEF.home, BRONZE_DEF.away, "f8"]].sort());
-            if (cur !== want) {
+          const isQForSF = (f) => f.round === "QF" || f.round === "SF";
+          const played = lg.fixtures.filter((f) => isQForSF(f) || f.settled);
+          const finalish = lg.fixtures.filter((f) => !isQForSF(f) && !f.settled);
+          const settledFinalish = lg.fixtures.filter((f) => !isQForSF(f) && f.settled);
+          if (settledFinalish.length === 0) {
+            const rebuilt = [...played, __spreadValues({}, FINAL_DEF), __spreadValues({}, BRONZE_DEF)];
+            const curIds = lg.fixtures.filter((f) => !isQForSF(f)).map((f) => `${f.home}|${f.away}|${f.id}`).sort().join(",");
+            const wantIds = [`${FINAL_DEF.home}|${FINAL_DEF.away}|f7`, `${BRONZE_DEF.home}|${BRONZE_DEF.away}|f8`].sort().join(",");
+            if (curIds !== wantIds) {
               lg = __spreadProps(__spreadValues({}, lg), { fixtures: rebuilt });
               changed = true;
             }
@@ -1487,6 +1487,25 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     setSlipMode("singles");
     flash(`Multi on. ${legs.length} legs, ella match-um jeikanum 🙏`);
   };
+  const fixFinalFixtures = async () => {
+    if (!requireAdmin()) return;
+    const mkScF = (arr) => arr.map(([name, team, odds, n2]) => ({ id: uid(), name, team, odds, num: n2 || 0, scored: false }));
+    const FINAL_DEF = { id: "f7", home: "Spain", away: "Argentina", round: "Final", locked: false, settled: false, kickoff: "2026-07-19T19:00:00Z", label: "🏆 FINAL · MON 20 JUL, 5:00 AM AEST", oddsH: 2.3, oddsA: 3.1, lh: 1.15, la: 1.25, resultH: 0, resultA: 0, winner: "", decided: "90", scorers: mkScF([["Oyarzabal", "home", 3.4, 21], ["F. Torres", "home", 3.8, 9], ["Yamal", "home", 3.2, 19], ["N. Williams", "home", 3.9, 17], ["Merino", "home", 5, 6], ["Olmo", "home", 5.5, 10], ["Pedro Porro", "home", 12, 2], ["Fabian Ruiz", "home", 8, 8], ["Messi", "away", 3.3, 10], ["Lautaro Martinez", "away", 3.4, 22], ["J. Alvarez", "away", 3.2, 9], ["E. Fernandez", "away", 6, 24], ["Mac Allister", "away", 5.5, 20], ["Nico Gonzalez", "away", 6.5, 15], ["Almada", "away", 7.5, 21]]) };
+    const BRONZE_DEF = { id: "f8", home: "France", away: "England", round: "Final", locked: false, settled: false, kickoff: "2026-07-18T21:00:00Z", label: "🥉 3RD PLACE · SUN 19 JUL, 7:00 AM AEST", oddsH: 2.05, oddsA: 3.3, lh: 1.9, la: 1.6, resultH: 0, resultA: 0, winner: "", decided: "90", scorers: mkScF([["Mbappe", "home", 2.1, 10], ["Dembele", "home", 3, 11], ["Thuram", "home", 3.4, 15], ["Olise", "home", 3.8, 14], ["Barcola", "home", 4.2, 20], ["Coman", "home", 4.5, 26], ["Griezmann", "home", 3.9, 7], ["Kane", "away", 2.9, 9], ["Bellingham", "away", 3.3, 10], ["Saka", "away", 3.8, 7], ["Gordon", "away", 4, 11], ["Foden", "away", 4.5, 22], ["Watkins", "away", 5, 18]]) };
+    const isQForSF = (f) => f.round === "QF" || f.round === "SF";
+    let lg = leagueRef.current;
+    const settledFinalish = lg.fixtures.filter((f) => !isQForSF(f) && f.settled);
+    const keepFinal = settledFinalish.find((f) => f.home === "Spain" || f.away === "Argentina");
+    const keepBronze = settledFinalish.find((f) => f.home === "France" || f.away === "England");
+    const played = lg.fixtures.filter((f) => isQForSF(f));
+    const rebuilt = [...played];
+    rebuilt.push(keepFinal ? keepFinal : __spreadValues({}, FINAL_DEF));
+    rebuilt.push(keepBronze ? keepBronze : __spreadValues({}, BRONZE_DEF));
+    lg = __spreadProps(__spreadValues({}, lg), { fixtures: rebuilt });
+    writeLeague(lg);
+    appendLog("Admin rebuilt the Final + 3rd-place fixtures (removed duplicates)");
+    flash("Final fixtures fixed: exactly 2 games");
+  };
   const restoreQFs = async () => {
     if (!requireAdmin()) return;
     const RES = {
@@ -1609,6 +1628,13 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       style: __spreadProps(__spreadValues({}, display), { marginTop: 8, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "9px 0" })
     },
     "↻ Restore the 4 QF results"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: fixFinalFixtures,
+      style: __spreadProps(__spreadValues({}, display), { marginTop: 6, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.chalk, background: C.cardHi, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 0" })
+    },
+    "⚑ Fix Final + 3rd-place fixtures"
   ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies France 2-0, Spain 2-1, England 2-1 (AET), Argentina 3-1 (AET) with correct scorers. Safe to tap: it only sets those four, leaves bets and SFs untouched, and points recompute instantly.")), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
     "button",
     {
