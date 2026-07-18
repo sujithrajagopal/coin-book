@@ -689,7 +689,7 @@ function App() {
       const vals = await Promise.all(keys.map(async (k) => {
         try {
           const r = await window.storage.get(k, true);
-          return r && r.value ? JSON.parse(r.value) : null;
+          return r && r.value ? __spreadProps(__spreadValues({}, JSON.parse(r.value)), { _k: k }) : null;
         } catch (e) {
           return null;
         }
@@ -1574,6 +1574,45 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     appendLog(`Admin voided all ${multis.length} multis: ${coins} coins refunded across ${new Set(multis.map((b) => b.ownerId)).size} players`, { aud: "admin" });
     flash(`${multis.length} multis voided, ${coins} coins refunded`);
   };
+  const purgeVoidEntries = async () => {
+    if (!requireAdmin()) return;
+    const isVoid = (e) => /void/i.test(e.msg || "") && !(e.aud && e.aud.indexOf("own:") === 0);
+    const targets = log.filter(isVoid);
+    if (targets.length === 0) {
+      flash("No void entries in the public log");
+      return;
+    }
+    if (!confirm(`Remove ${targets.length} void entr${targets.length === 1 ? "y" : "ies"} from the public log? Private notices to affected players stay.`)) return;
+    for (const e of targets) {
+      if (e._k) {
+        try {
+          await window.storage.delete(e._k, true);
+        } catch (err) {
+        }
+      }
+    }
+    try {
+      const r = await window.storage.get(K_LOG, true);
+      if (r && r.value) {
+        const arr = JSON.parse(r.value).filter((e) => !isVoid(e));
+        await window.storage.set(K_LOG, JSON.stringify(arr), true);
+      }
+    } catch (err) {
+    }
+    await loadLog();
+    appendLog(`Admin purged ${targets.length} void entries from the public log`, { aud: "admin" });
+    flash(`${targets.length} entries removed`);
+  };
+  const hideLogEntry = async (e) => {
+    if (!requireAdmin() || !e._k) return;
+    try {
+      await window.storage.set(e._k, JSON.stringify(__spreadProps(__spreadValues({}, e), { aud: "admin", _k: void 0 })), true);
+      await loadLog();
+      flash("Entry moved to the admin log");
+    } catch (err) {
+      flash("Could not hide entry");
+    }
+  };
   const restoreQFs = async () => {
     if (!requireAdmin()) return;
     let lg = leagueRef.current;
@@ -1701,7 +1740,14 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     "⚑ Fix Final + 3rd-place fixtures"
   ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies every completed match (4 QFs + 2 semis) with correct scores, winners and scorers, matched by team name so it always finds the right fixture. Safe to tap anytime: it never touches the Final or 3rd-place game, and points recompute instantly.")), /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${C.line}`, borderRadius: 8, padding: "10px 12px", marginBottom: 12 } }, /* @__PURE__ */ React.createElement(H, null, "Void bets"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, margin: "3px 0 8px" } }, "Voiding removes a bet and refunds its coins. Use it for genuine rule confusion, never after a result is known if the bet would have won. Every void is logged publicly with the pick."), (() => {
     const multis = bets.filter((b) => b.market === "multi");
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between", style: { marginBottom: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600 } }, multis.length, " multi", multis.length === 1 ? "" : "s", " on the board"), multis.length > 0 && /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between", style: { marginBottom: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600 } }, multis.length, " multi", multis.length === 1 ? "" : "s", " on the board"), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: purgeVoidEntries,
+        style: __spreadProps(__spreadValues({}, body), { fontSize: 11, fontWeight: 700, color: C.chalk, background: C.cardHi, border: `1px solid ${C.line}`, borderRadius: 7, padding: "5px 10px", marginRight: 6 })
+      },
+      "Clear void entries from public log"
+    ), multis.length > 0 && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => {
@@ -2090,7 +2136,14 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     ))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-2" }, /* @__PURE__ */ React.createElement("select", { value: logWho, onChange: (e) => setLogWho(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All players"), league.owners.filter((o) => o.name.trim()).map((o) => /* @__PURE__ */ React.createElement("option", { key: o.id, value: o.id }, o.name))), /* @__PURE__ */ React.createElement("select", { value: logGame, onChange: (e) => setLogGame(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All matches"), league.fixtures.map((f) => /* @__PURE__ */ React.createElement("option", { key: f.id, value: f.id }, f.home, " v ", f.away))))), filtered.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: 14, fontSize: 13, color: C.chalkDim } }, "No events match these filters."), filtered.map((e, i) => {
       const f = e.matchId ? league.fixtures.find((x) => x.id === e.matchId) : null;
       const unsealed = !e.detail || !f || f.settled || f.locked || Date.now() >= Date.parse(f.kickoff) && !f.forceOpen;
-      return /* @__PURE__ */ React.createElement("div", { key: e.t + "_" + i, style: { padding: "9px 14px", borderBottom: `1px solid ${C.line}`, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 11, marginRight: 8 } }, new Date(e.t).toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })), e.msg, e.detail ? unsealed ? /* @__PURE__ */ React.createElement("span", { style: { color: C.coinDeep, fontWeight: 600 } }, " : ", e.detail) : /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " 🔒 receipt sealed until kickoff") : null);
+      return /* @__PURE__ */ React.createElement("div", { key: e.t + "_" + i, style: { padding: "9px 14px", borderBottom: `1px solid ${C.line}`, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 11, marginRight: 8 } }, new Date(e.t).toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })), e.msg, e.detail ? unsealed ? /* @__PURE__ */ React.createElement("span", { style: { color: C.coinDeep, fontWeight: 600 } }, " : ", e.detail) : /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " 🔒 receipt sealed until kickoff") : null, adminOk && !logAdminView && e._k && /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => hideLogEntry(e),
+          style: __spreadProps(__spreadValues({}, body), { fontSize: 10, color: C.chalkDim, background: "transparent", border: `1px solid ${C.line}`, borderRadius: 6, padding: "1px 7px", marginLeft: 8 })
+        },
+        "hide"
+      ));
     }));
   })()), tab === "bets" && slip.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "slipup", style: { position: "fixed", left: 0, right: 0, bottom: "calc(76px + env(safe-area-inset-bottom, 0px))", zIndex: 60, background: C.card, borderTop: `2px solid ${C.coin}`, boxShadow: "0 -6px 20px rgba(0,0,0,0.10)", padding: "10px 14px 12px" } }, (() => {
     const canMulti = slip.length >= 2;
