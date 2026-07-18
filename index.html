@@ -234,75 +234,83 @@ const STATS_ASOF = "8 Jul 2026";
 const FLAGS = { France: "🇫🇷", Morocco: "🇲🇦", Spain: "🇪🇸", Belgium: "🇧🇪", England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Norway: "🇳🇴", Argentina: "🇦🇷", Switzerland: "🇨🇭" };
 const flag = (name) => FLAGS[name] || "";
 const TEAM_STATS = {
-  France: {
-    prob: 55.5,
-    gf: 16,
+  Spain: {
+    prob: 56,
+    gf: 15,
     ga: 2,
-    cs: 4,
-    xg: 2.22,
-    xga: 0.63,
-    xgd: "+1.59",
-    group: "SF1 v Spain · Wed 15 Jul 5am",
+    cs: 6,
+    xg: 1.94,
+    xga: 0.48,
+    xgd: "+1.46",
+    role: "FINAL",
+    opp: "Argentina",
+    badge: "🏆 FINAL",
     form: [
-      { r: "W", s: "3-0", o: "IRQ", xg: 2.38, xga: 0.6 },
-      { r: "W", s: "4-1", o: "NOR", xg: 1.5, xga: 1.7, note: "Outshot on xG, won 4-1: Dembele hat trick" },
+      { r: "W", s: "1-0", o: "URU", xg: 0.86, xga: 0.2 },
+      { r: "W", s: "3-0", o: "AUT", xg: 2.8, xga: 0.29 },
+      { r: "W", s: "1-0", o: "POR", xg: 1.77, xga: 0.6, note: "Merino ended Ronaldo's WC" },
+      { r: "W", s: "2-1", o: "BEL", xg: 2.1, xga: 0.85, note: "QF: only goal they've conceded all tournament" },
+      { r: "W", s: "2-0", o: "FRA", xg: 1.42, xga: 0.26, note: "SF: held France to 0.26 xG. Oyarzabal pen + Pedro Porro. A masterclass" }
+    ],
+    players: [{ n: "Oyarzabal", g: 5, num: 21 }, { n: "Merino", g: 2, num: 6 }, { n: "Pedro Porro", g: 1, num: 2 }]
+  },
+  Argentina: {
+    prob: 44,
+    gf: 19,
+    ga: 7,
+    cs: 2,
+    xg: 2.24,
+    xga: 0.92,
+    xgd: "+1.32",
+    role: "FINAL",
+    opp: "Spain",
+    badge: "🏆 FINAL",
+    form: [
+      { r: "W", s: "2-1", o: "CPV", xg: 2.61, xga: 0.84 },
+      { r: "W", s: "3-2", o: "EGY", xg: 2.2, xga: 1.35, note: "Messi's 8th; survived a scare" },
+      { r: "W", s: "3-1", o: "SUI", xg: 2.8, xga: 1, et: true, note: "QF AET: Alvarez screamer at 112'" },
+      { r: "W", s: "2-1", o: "ENG", xg: 1.55, xga: 1.7, note: "SF: outshot on xG, won on late Enzo + Lautaro strikes. Clutch, not dominant" },
+      { r: "W", s: "2-1", o: "ENG", xg: 0, xga: 0, hide: true }
+    ].filter((m) => !m.hide),
+    players: [{ n: "Messi", g: 8, a: 4, num: 10 }, { n: "J. Alvarez", g: 3, num: 9 }, { n: "Lautaro Martinez", g: 3, num: 22 }, { n: "Mac Allister", g: 2, num: 20 }]
+  },
+  France: {
+    prob: 55,
+    gf: 16,
+    ga: 4,
+    cs: 4,
+    xg: 2.1,
+    xga: 0.71,
+    xgd: "+1.39",
+    role: "BRONZE",
+    opp: "England",
+    badge: "🥉 3RD PLACE",
+    form: [
       { r: "W", s: "3-0", o: "SWE", xg: 3.17, xga: 0.66 },
-      { r: "W", s: "1-0", o: "PAR", xg: 1.45, xga: 0.13, note: "Mbappe penalty settled it" },
-      { r: "W", s: "2-0", o: "MAR", xg: 3.04, xga: 0.14, note: "QF: Mbappe (8th) + Dembele; missed a pen too. Total control" }
+      { r: "W", s: "1-0", o: "PAR", xg: 1.45, xga: 0.13 },
+      { r: "W", s: "2-0", o: "MAR", xg: 3.04, xga: 0.14, note: "QF: total control, Mbappe + Dembele" },
+      { r: "L", s: "0-2", o: "ESP", xg: 0.26, xga: 1.42, note: "SF: smothered. Just 0.26 xG, worst attacking display of their tournament" }
     ],
     players: [{ n: "Mbappe", g: 8, a: 2, num: 10 }, { n: "Dembele", g: 5, num: 11 }]
   },
-  Spain: {
-    prob: 44.5,
-    gf: 11,
-    ga: 1,
-    cs: 5,
-    xg: 2.02,
-    xga: 0.42,
-    xgd: "+1.60",
-    group: "SF1 v France · Wed 15 Jul 5am",
-    form: [
-      { r: "W", s: "4-0", o: "KSA", xg: 2.3, xga: 0.15 },
-      { r: "W", s: "1-0", o: "URU", xg: 0.86, xga: 0.2 },
-      { r: "W", s: "3-0", o: "AUT", xg: 2.8, xga: 0.29 },
-      { r: "W", s: "1-0", o: "POR", xg: 1.77, xga: 0.6, note: "Merino late winner, ended Ronaldo's World Cup" },
-      { r: "W", s: "2-1", o: "BEL", xg: 2.1, xga: 0.85, note: "QF: first goal conceded all tournament; Merino wins it again at 88'" }
-    ],
-    players: [{ n: "Oyarzabal", g: 4, num: 21 }, { n: "Merino", g: 2, num: 6 }, { n: "Fabian Ruiz", g: 1, num: 8 }]
-  },
   England: {
-    prob: 51.4,
-    gf: 13,
-    ga: 6,
+    prob: 45,
+    gf: 15,
+    ga: 8,
     cs: 2,
-    xg: 1.83,
-    xga: 0.96,
-    xgd: "+0.87",
-    group: "SF2 v Argentina · Thu 16 Jul 5am",
+    xg: 1.88,
+    xga: 1.12,
+    xgd: "+0.76",
+    role: "BRONZE",
+    opp: "France",
+    badge: "🥉 3RD PLACE",
     form: [
-      { r: "W", s: "2-0", o: "JPN", xg: 1.65, xga: 0.71 },
-      { r: "D", s: "1-1", o: "GHA", xg: 1.32, xga: 0.94, note: "Flat draw, questions asked" },
-      { r: "W", s: "3-2", o: "MEX", xg: 2.1, xga: 1.6, note: "Kane pen decisive in a wild R16" },
-      { r: "W", s: "2-1", o: "NOR", xg: 1.9, xga: 1.4, et: true, note: "QF, AET: Bellingham brace; Haaland held to 21 touches" }
-    ],
-    players: [{ n: "Kane", g: 6, num: 9 }, { n: "Bellingham", g: 6, num: 10 }, { n: "Saka", g: 2, num: 7 }]
-  },
-  Argentina: {
-    prob: 48.6,
-    gf: 17,
-    ga: 6,
-    cs: 2,
-    xg: 2.31,
-    xga: 0.83,
-    xgd: "+1.48",
-    group: "SF2 v England · Thu 16 Jul 5am",
-    form: [
-      { r: "W", s: "3-1", o: "AUS", xg: 2.45, xga: 0.9 },
-      { r: "W", s: "2-1", o: "CPV", xg: 2.61, xga: 0.84, note: "Closer than it should have been" },
-      { r: "W", s: "3-2", o: "EGY", xg: 2.2, xga: 1.35, note: "Messi's 8th; survived a scare" },
-      { r: "W", s: "3-1", o: "SUI", xg: 2.8, xga: 1, et: true, note: "QF, AET: Alvarez screamer at 112'; Messi blanked but ran the game" }
-    ],
-    players: [{ n: "Messi", g: 8, a: 3, num: 10 }, { n: "Alvarez", g: 3, num: 9 }, { n: "Mac Allister", g: 2, num: 20 }, { n: "Lautaro Martinez", g: 2, num: 22 }]
+      { r: "W", s: "3-2", o: "MEX", xg: 2.1, xga: 1.6 },
+      { r: "W", s: "2-1", o: "NOR", xg: 1.9, xga: 1.4, et: true, note: "QF AET: Bellingham brace" },
+      { r: "W", s: "2-1", o: "NOR", xg: 0, xga: 0, hide: true },
+      { r: "L", s: "1-2", o: "ARG", xg: 1.7, xga: 1.55, note: "SF: led, then conceded 85' and 92'. Gordon scored. Heartbreak" }
+    ].filter((m) => !m.hide),
+    players: [{ n: "Kane", g: 6, num: 9 }, { n: "Bellingham", g: 6, num: 10 }, { n: "Gordon", g: 1, num: 11 }, { n: "Saka", g: 2, num: 7 }]
   }
 };
 const formColor = (r) => r === "W" ? C.live : r === "D" ? C.coin : C.out;
@@ -659,8 +667,6 @@ function App() {
   const [openRounds, setOpenRounds] = useState({});
   const [openRule, setOpenRule] = useState(-1);
   const [statsHelp, setStatsHelp] = useState(false);
-  const [h2hA, setH2hA] = useState("France");
-  const [h2hB, setH2hB] = useState("Spain");
   const [showAudit, setShowAudit] = useState(false);
   const [helpSeen, setHelpSeen] = useState(true);
   const saveTimer = useRef(null);
@@ -710,6 +716,14 @@ function App() {
         if (r && r.value) {
           let lg = JSON.parse(r.value);
           let changed = false;
+          const NAME_FIX = { "Sathya": "Sathiya", "Sathiyaa": "Sathiya", "Abhiram": "Abiram", "Abhiraam": "Abiram" };
+          if (lg.owners && lg.owners.some((o) => NAME_FIX[(o.name || "").trim()])) {
+            lg = __spreadProps(__spreadValues({}, lg), { owners: lg.owners.map((o) => {
+              const f = NAME_FIX[(o.name || "").trim()];
+              return f ? __spreadProps(__spreadValues({}, o), { name: f }) : o;
+            }) });
+            changed = true;
+          }
           const fixNums = (f) => {
             const oH = num(f.oddsH, 1.9), oA = num(f.oddsA, 1.9), lh = rate(f.lh), la = rate(f.la);
             const scs = (f.scorers || []).map((s) => __spreadProps(__spreadValues({}, s), { odds: num(s.odds, 3), num: num(s.num, 0) }));
@@ -1506,24 +1520,28 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     appendLog("Admin rebuilt the Final + 3rd-place fixtures (removed duplicates)");
     flash("Final fixtures fixed: exactly 2 games");
   };
+  const SETTLED_RESULTS = [
+    { home: "France", away: "Morocco", rH: 2, rA: 0, w: "home", dec: "90", scorers: ["Mbappe", "Dembele"] },
+    { home: "Spain", away: "Belgium", rH: 2, rA: 1, w: "home", dec: "90", scorers: ["Fabian Ruiz", "De Ketelaere", "Merino"] },
+    { home: "Norway", away: "England", rH: 1, rA: 2, w: "away", dec: "et", scorers: ["Bellingham"] },
+    { home: "Argentina", away: "Switzerland", rH: 3, rA: 1, w: "home", dec: "et", scorers: ["Mac Allister", "Alvarez", "Lautaro Martinez"] },
+    { home: "France", away: "Spain", rH: 0, rA: 2, w: "away", dec: "90", scorers: ["Oyarzabal", "Pedro Porro"] },
+    { home: "England", away: "Argentina", rH: 1, rA: 2, w: "away", dec: "90", scorers: ["Gordon", "Fernandez", "Lautaro Martinez"] }
+  ];
   const restoreQFs = async () => {
     if (!requireAdmin()) return;
-    const RES = {
-      f1: { rH: 2, rA: 0, w: "home", dec: "90", scorers: ["Mbappe", "Dembele"] },
-      f2: { rH: 2, rA: 1, w: "home", dec: "90", scorers: ["Fabian Ruiz", "De Ketelaere", "Merino"] },
-      f3: { rH: 1, rA: 2, w: "away", dec: "et", scorers: ["Bellingham"] },
-      f4: { rH: 3, rA: 1, w: "home", dec: "et", scorers: ["Mac Allister", "Alvarez", "Lautaro Martinez"] }
-    };
     let lg = leagueRef.current;
+    let applied = 0;
     lg = __spreadProps(__spreadValues({}, lg), { fixtures: lg.fixtures.map((f) => {
-      const r = RES[f.id];
+      const r = SETTLED_RESULTS.find((x) => x.home === f.home && x.away === f.away);
       if (!r) return f;
+      applied++;
       const scs = (f.scorers || []).map((s) => __spreadProps(__spreadValues({}, s), { scored: r.scorers.some((n) => s.name.toLowerCase().includes(n.toLowerCase().split(" ").pop())) }));
       return __spreadProps(__spreadValues({}, f), { settled: true, locked: true, resultH: r.rH, resultA: r.rA, winner: r.w, decided: r.dec, scorers: scs });
     }) });
     writeLeague(lg);
-    appendLog("Admin restored the four QF results (scores, winners, scorers)");
-    flash("QFs restored: points recalculating");
+    appendLog(`Admin restored ${applied} settled results (QFs + semifinals)`);
+    flash(`Restored ${applied} results: points recalculating`);
   };
   const settleFixture = async (fx) => {
     if (!fx.winner) {
@@ -1627,7 +1645,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       onClick: restoreQFs,
       style: __spreadProps(__spreadValues({}, display), { marginTop: 8, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.ink, background: C.coin, border: "none", borderRadius: 8, padding: "9px 0" })
     },
-    "↻ Restore the 4 QF results"
+    "↻ Restore all settled results (QF + SF)"
   ), /* @__PURE__ */ React.createElement(
     "button",
     {
@@ -1635,7 +1653,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       style: __spreadProps(__spreadValues({}, display), { marginTop: 6, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.chalk, background: C.cardHi, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 0" })
     },
     "⚑ Fix Final + 3rd-place fixtures"
-  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies France 2-0, Spain 2-1, England 2-1 (AET), Argentina 3-1 (AET) with correct scorers. Safe to tap: it only sets those four, leaves bets and SFs untouched, and points recompute instantly.")), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
+  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies every completed match (4 QFs + 2 semis) with correct scores, winners and scorers, matched by team name so it always finds the right fixture. Safe to tap anytime: it never touches the Final or 3rd-place game, and points recompute instantly.")), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => {
@@ -1744,13 +1762,18 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
         maxStake: me ? Math.min(capFor(fx.round) - spentRound(me, fx.round), S.coins - spentTotal(me)) : 0
       }
     )));
-  })), tab === "stats" && /* @__PURE__ */ React.createElement(Card, { style: { borderColor: C.coinDeep } }, /* @__PURE__ */ React.createElement(H, { color: C.coinDeep }, "Semifinal reads"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, lineHeight: 1.6, marginTop: 6 } }, /* @__PURE__ */ React.createElement("b", null, "🇫🇷 France v Spain 🇪🇸"), " · Two best defences left (0.63 v 0.42 xGA/g). France's attack is hotter (2.22 xG/g, Mbappe on 8) but Spain have conceded once all cup. Numbers say: Under 2.5 leans live, BTTS No has a case, and the 1-0 / 2-1 correct-score band is where the value sits. Merino at 4.50 after two late winners is the form pick nobody prices right.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "🏴󠁧󠁢󠁥󠁮󠁧󠁿 England v Argentina 🇦🇷"), ` · A genuine coin flip (51/49). Argentina score more (2.31 xG/g) but England's Bellingham is on 6 with a brace in the QF. Both QFs went to extra time and these two defend set pieces badly late: "Extra time" in the How It's Decided market is short-priced chaos worth a small coin. Messi at 2.00 blanked last game; regression cuts both ways.`)), tab === "stats" && (() => {
-    const names = Object.keys(TEAM_STATS);
-    const D = (st) => {
+  })), tab === "stats" && (() => {
+    const D = (nm) => {
+      const st = TEAM_STATS[nm];
+      if (!st) return null;
       const N = st.form.length;
       const parse = (m) => m.s.split("-").map(Number);
+      const gpg = st.gf / 7, cpg = st.ga / 7;
       return {
+        st,
         N,
+        gpg,
+        cpg,
         btts: st.form.filter((m) => {
           const [g, c] = parse(m);
           return g > 0 && c > 0;
@@ -1759,86 +1782,42 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
           const [g, c] = parse(m);
           return g + c >= 3;
         }).length,
-        gpg: st.gf / (N + 2),
-        cpg: st.ga / (N + 2)
+        finish: gpg - st.xg,
+        defLuck: st.xga - cpg
       };
     };
-    const A = TEAM_STATS[h2hA], B = TEAM_STATS[h2hB];
-    const dA = D(A), dB = D(B);
-    const rows2 = [
-      ["Advance %", A.prob.toFixed(1), B.prob.toFixed(1), "high"],
-      ["Goals / game", dA.gpg.toFixed(2), dB.gpg.toFixed(2), "high"],
-      ["Conceded / game", dA.cpg.toFixed(2), dB.cpg.toFixed(2), "low"],
-      ["xG / game", A.xg.toFixed(2), B.xg.toFixed(2), "high"],
-      ["xGA / game", A.xga.toFixed(2), B.xga.toFixed(2), "low"],
-      ["Finishing vs xG", (dA.gpg - A.xg >= 0 ? "+" : "") + (dA.gpg - A.xg).toFixed(2), (dB.gpg - B.xg >= 0 ? "+" : "") + (dB.gpg - B.xg).toFixed(2), null],
-      ["BTTS hit", `${dA.btts}/${dA.N}`, `${dB.btts}/${dB.N}`, null],
-      ["Over 2.5 hit", `${dA.over}/${dA.N}`, `${dB.over}/${dB.N}`, null],
-      ["Clean sheets", A.cs, B.cs, "high"],
-      ["Top scorer", `${A.players[0].n} (${A.players[0].g})`, `${B.players[0].n} (${B.players[0].g})`, null]
-    ];
-    const better = (a, b, dir) => {
-      if (!dir) return 0;
-      const na = parseFloat(a), nb = parseFloat(b);
-      if (isNaN(na) || isNaN(nb) || na === nb) return 0;
-      return (dir === "high" ? na > nb : na < nb) ? 1 : 2;
+    const Matchup = ({ home, away, kickoff, badge, accent }) => {
+      const A = D(home), B = D(away);
+      if (!A || !B) return null;
+      const winProb = (a, b) => Math.round(100 * a.st.prob / (a.st.prob + b.st.prob));
+      const pA = winProb(A, B), pB = 100 - pA;
+      const bar = (label, a, b, dir, fmt) => {
+        const na = parseFloat(a), nb = parseFloat(b);
+        const better = dir === "high" ? na > nb ? 1 : na < nb ? 2 : 0 : na < nb ? 1 : na > nb ? 2 : 0;
+        const tot = Math.abs(na) + Math.abs(nb) || 1;
+        const wA = Math.round(100 * Math.abs(na) / tot);
+        return /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 9 } }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between", style: { fontSize: 11, marginBottom: 2 } }, /* @__PURE__ */ React.createElement("b", { style: { color: better === 1 ? accent : C.chalk } }, fmt ? fmt(na) : a), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 10, textTransform: "uppercase", letterSpacing: 1 } }, label), /* @__PURE__ */ React.createElement("b", { style: { color: better === 2 ? accent : C.chalk } }, fmt ? fmt(nb) : b)), /* @__PURE__ */ React.createElement("div", { className: "flex", style: { height: 5, borderRadius: 3, overflow: "hidden", background: C.cardHi } }, /* @__PURE__ */ React.createElement("div", { style: { width: wA + "%", background: better === 1 ? accent : C.chalkDim, opacity: better === 1 ? 1 : 0.4 } }), /* @__PURE__ */ React.createElement("div", { style: { width: 100 - wA + "%", background: better === 2 ? accent : C.chalkDim, opacity: better === 2 ? 1 : 0.4, marginLeft: 1 } })));
+      };
+      const insights = [];
+      const combGoals = (A.gpg + B.cpg) / 2 + (B.gpg + A.cpg) / 2;
+      if (combGoals < 2.3) insights.push({ t: "Low-scoring lean", d: `Combined expected goals ~${combGoals.toFixed(1)}. Under 2.5 and tight correct scores (1-0, 2-1, 0-0) hold value.`, m: "Under 2.5 / low scores" });
+      else if (combGoals > 3) insights.push({ t: "Goals expected", d: `Combined expected goals ~${combGoals.toFixed(1)}. Over 2.5 and BTTS Yes are the shape of this game.`, m: "Over 2.5 / BTTS Yes" });
+      if (A.defLuck < -0.3 || B.defLuck < -0.3) {
+        const t = A.defLuck < B.defLuck ? home : away;
+        insights.push({ t: `${t} riding defensive luck`, d: `Conceding fewer than their chances allow. That regresses: opposition scorers appeal.`, m: "Opp scorers" });
+      }
+      if (A.finish > 0.3) insights.push({ t: `${home} finishing hot`, d: `Scoring ${A.finish.toFixed(2)} above xG/game. Sharp, but hot streaks cool: fade if you're contrarian.`, m: "Fade scorers" });
+      if (B.finish > 0.3) insights.push({ t: `${away} finishing hot`, d: `Scoring ${B.finish.toFixed(2)} above xG/game. Regression risk on their scorers.`, m: "Fade scorers" });
+      const et = A.st.form.slice(-1)[0].et || B.st.form.slice(-1)[0].et;
+      if (et) insights.push({ t: "Extra-time pedigree", d: "One or both came through a knockout that went the distance. 'Extra time' in How It's Decided is live.", m: "Extra time" });
+      return /* @__PURE__ */ React.createElement(Card, { style: { overflow: "hidden", padding: 0, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { height: 3, background: accent } }), /* @__PURE__ */ React.createElement("div", { style: { padding: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, fontWeight: 700, letterSpacing: 2, color: accent, textTransform: "uppercase" } }, badge), /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between", style: { margin: "8px 0 4px" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 26 } }, flag(home)), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 15, fontWeight: 800, textTransform: "uppercase", lineHeight: 1.1 }) }, home)), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "0 8px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 11, color: C.chalkDim }) }, "WIN %"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800 }) }, /* @__PURE__ */ React.createElement("span", { style: { color: accent } }, pA), " ", /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 13 } }, "·"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: C.chalk } }, pB)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim } }, kickoff)), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 26 } }, flag(away)), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 15, fontWeight: 800, textTransform: "uppercase", lineHeight: 1.1 }) }, away))), /* @__PURE__ */ React.createElement("div", { className: "flex", style: { height: 8, borderRadius: 4, overflow: "hidden", margin: "6px 0 14px" } }, /* @__PURE__ */ React.createElement("div", { style: { width: pA + "%", background: accent } }), /* @__PURE__ */ React.createElement("div", { style: { width: pB + "%", background: C.chalkDim, opacity: 0.5 } })), bar("Goals / game", A.gpg.toFixed(2), B.gpg.toFixed(2), "high"), bar("Conceded / game", A.cpg.toFixed(2), B.cpg.toFixed(2), "low"), bar("xG / game", A.st.xg.toFixed(2), B.st.xg.toFixed(2), "high"), bar("xGA / game", A.st.xga.toFixed(2), B.st.xga.toFixed(2), "low"), bar("Clean sheets", A.st.cs, B.st.cs, "high"), bar("BTTS hit", A.btts, B.btts, "high", (v) => `${v}/${A.N}`), bar("Over 2.5 hit", A.over, B.over, "high", (v) => `${v}/${A.N}`), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 6, paddingTop: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, fontWeight: 700, letterSpacing: 2, color: C.chalkDim, textTransform: "uppercase", marginBottom: 6 } }, "What the numbers say"), insights.map((ins, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { marginBottom: 8 } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 12, fontWeight: 700, color: C.chalk }) }, ins.t), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: accent, background: accent + "18", borderRadius: 999, padding: "1px 8px", textTransform: "uppercase", letterSpacing: 1 } }, ins.m)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, lineHeight: 1.5 } }, ins.d)))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${C.line}`, marginTop: 4, paddingTop: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, fontWeight: 700, letterSpacing: 2, color: C.chalkDim, textTransform: "uppercase", marginBottom: 6 } }, "Top scorers"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, [home, away].map((nm, side) => /* @__PURE__ */ React.createElement("div", { key: nm, style: { flex: 1 } }, TEAM_STATS[nm].players.slice(0, 3).map((p) => /* @__PURE__ */ React.createElement("div", { key: p.n, className: "flex items-center gap-2", style: { marginBottom: 3 } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { teamName: nm, num: p.num, name: p.n, size: 22 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalk, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, p.n), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 11, fontWeight: 700, color: accent }) }, p.g)))))))));
     };
-    return /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement(H, null, "Head to head"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1" }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
-      setH2hA("France");
-      setH2hB("Spain");
-    }, style: __spreadProps(__spreadValues({}, body), { fontSize: 10, fontWeight: 700, color: C.coinDeep, background: C.cardHi, border: "none", borderRadius: 999, padding: "3px 9px" }) }, "SF1"), /* @__PURE__ */ React.createElement("button", { onClick: () => {
-      setH2hA("England");
-      setH2hB("Argentina");
-    }, style: __spreadProps(__spreadValues({}, body), { fontSize: 10, fontWeight: 700, color: C.coinDeep, background: C.cardHi, border: "none", borderRadius: 999, padding: "3px 9px" }) }, "SF2"))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-2" }, [["A", h2hA, setH2hA], ["B", h2hB, setH2hB]].map(([s, v, set]) => /* @__PURE__ */ React.createElement("select", { key: s, value: v, onChange: (e) => set(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, fontWeight: 700 }) }, names.map((n) => /* @__PURE__ */ React.createElement("option", { key: n }, n))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8 } }, /* @__PURE__ */ React.createElement("div", { className: "flex", style: { fontSize: 12, fontWeight: 700, padding: "4px 0", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1.2 } }), /* @__PURE__ */ React.createElement("span", { style: { flex: 1, textAlign: "center" } }, flag(h2hA), " ", h2hA), /* @__PURE__ */ React.createElement("span", { style: { flex: 1, textAlign: "center" } }, flag(h2hB), " ", h2hB)), rows2.map(([l, a, b, dir]) => {
-      const w = better(a, b, dir);
-      return /* @__PURE__ */ React.createElement("div", { key: l, className: "flex items-center", style: { fontSize: 12, padding: "5px 0", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1.2, color: C.chalkDim, fontSize: 11 } }, l), /* @__PURE__ */ React.createElement("span", { style: { flex: 1, textAlign: "center", fontWeight: w === 1 ? 800 : 500, color: w === 1 ? C.live : C.chalk } }, a), /* @__PURE__ */ React.createElement("span", { style: { flex: 1, textAlign: "center", fontWeight: w === 2 ? 800 : 500, color: w === 2 ? C.live : C.chalk } }, b));
-    })), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, marginTop: 6 } }, 'Green = statistically stronger side of that row. Finishing and hit rates are patterns, not verdicts: see "How to use these numbers."'));
-  })(), tab === "stats" && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 800, textTransform: "uppercase", letterSpacing: 2, marginTop: 4 }) }, "Tournament form"), /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("button", { onClick: () => setStatsHelp(!statsHelp), className: "flex items-center justify-between", style: { width: "100%", background: "transparent", border: "none", padding: 0, textAlign: "left" } }, /* @__PURE__ */ React.createElement(H, null, "How to use these numbers"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, statsHelp ? "▾" : "▸")), statsHelp && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, lineHeight: 1.65, marginTop: 8 } }, /* @__PURE__ */ React.createElement("b", null, "xG / xGA"), " → the quality of chances created and allowed. Big xG gap = back the ", /* @__PURE__ */ React.createElement("b", null, "Winner"), "; two low xGA sides = ", /* @__PURE__ */ React.createElement("b", null, "Under 2.5"), " and low ", /* @__PURE__ */ React.createElement("b", null, "Correct Scores"), ".", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "Finishing"), " (goals vs xG) → positive = scoring more than chances deserve. Hot runs cool: fade their ", /* @__PURE__ */ React.createElement("b", null, "scorers"), ". Negative = due goals: their ", /* @__PURE__ */ React.createElement("b", null, "scorer prices"), " are quietly value.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "Defensive luck"), " (xGA vs conceded) → conceding less than the chances allowed = a keeper on fire, which rarely lasts: ", /* @__PURE__ */ React.createElement("b", null, "BTTS Yes"), " against them appeals.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "BTTS / Over hit rates"), " → direct form for the ", /* @__PURE__ */ React.createElement("b", null, "Both Teams To Score"), " and ", /* @__PURE__ */ React.createElement("b", null, "Total Goals"), " markets. 4/5 either way is a pattern, not noise.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "Clean sheets / failed to score"), " → feeds ", /* @__PURE__ */ React.createElement("b", null, "Correct Score"), " shape: pick scorelines that match how these teams actually finish games.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "(AET) tags"), " → knockout sides that keep going long make ", /* @__PURE__ */ React.createElement("b", null, "Extra Time"), " in the How It's Decided market live, and stretch ", /* @__PURE__ */ React.createElement("b", null, "scorer"), " minutes.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, "The honest bit: these are edges, not answers. The model prices the odds; upsets are why it's fun. Bet the tilt, never the certainty."))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: -12 } }, "Every match analysed individually, as of ", STATS_ASOF, ". Per-match xG from the RealGM tracker; player goals from the official Golden Boot standings. Win % is the market's chance of winning the QF including penalties."), Object.entries(TEAM_STATS).map(([name, st]) => /* @__PURE__ */ React.createElement(Card, { key: name }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 700, textTransform: "uppercase" }) }, flag(name), " ", name), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 22, fontWeight: 800, color: st.prob >= 50 ? C.live : C.coin, lineHeight: 1 }) }, st.prob, "%"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim } }, "QF win"))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "2px 0 8px" } }, st.group), /* @__PURE__ */ React.createElement(FormPills, { name, size: 28 }), (() => {
-    const parse = (m) => m.s.split("-").map(Number);
-    const N = st.form.length;
-    const btts = st.form.filter((m) => {
-      const [g, c] = parse(m);
-      return g > 0 && c > 0;
-    }).length;
-    const over = st.form.filter((m) => {
-      const [g, c] = parse(m);
-      return g + c >= 3;
-    }).length;
-    const fts = st.form.filter((m) => parse(m)[0] === 0).length;
-    const avgTot = (st.form.reduce((s, m) => {
-      const [g, c] = parse(m);
-      return s + g + c;
-    }, 0) / N).toFixed(1);
-    const finish = st.gf / (N + 2) - st.xg;
-    const defLuck = st.xga - st.ga / (N + 2);
-    const tiles = [
-      ["Goals/game", (st.gf / (N + 2)).toFixed(1), `${st.gf} scored (whole cup)`, C.chalk],
-      ["Conceded/game", (st.ga / (N + 2)).toFixed(1), `${st.ga} against (whole cup)`, C.chalk],
-      ["xG / game", st.xg.toFixed(2), "chances created", C.chalk],
-      ["xGA / game", st.xga.toFixed(2), "chances allowed", C.chalk],
-      ["xG diff", st.xgd, "per game", C.chalk],
-      ["Clean sheets", `${st.cs} total`, `failed to score ${fts}x recently`, C.chalk],
-      ["Finishing", (finish >= 0 ? "+" : "") + finish.toFixed(2), finish > 0.25 ? "running hot" : finish < -0.25 ? "wasteful" : "as expected", finish > 0.25 ? C.live : finish < -0.25 ? C.out : C.chalk],
-      ["Defensive luck", (defLuck >= 0 ? "+" : "") + defLuck.toFixed(2), defLuck > 0.25 ? "keeper saving them" : defLuck < -0.25 ? "leaking vs xG" : "as expected", defLuck > 0.25 ? C.live : defLuck < -0.25 ? C.out : C.chalk],
-      [`BTTS hit`, `${btts}/${N}`, "recent matches", btts >= 3 ? C.live : C.chalk],
-      [`Over 2.5 hit`, `${over}/${N}`, `avg ${avgTot} match goals`, over >= 3 ? C.live : C.chalk]
-    ];
-    const pointers = [];
-    if (over >= 4) pointers.push("their matches back Over 2.5");
-    if (over <= 1) pointers.push("their matches back Under 2.5");
-    if (btts >= 4) pointers.push("BTTS Yes has landed almost every game");
-    if (btts <= 1) pointers.push("BTTS No is the pattern");
-    if (finish > 0.3) pointers.push("scoring above xG: regression risk on their scorers");
-    if (finish < -0.3) pointers.push("underscoring their xG: scorer odds may be value");
-    if (defLuck < -0.3) pointers.push("conceding more than xGA: opponents' scorers appeal");
-    if (st.form[st.form.length - 1] && st.form[st.form.length - 1].et) pointers.push("went the full 120 last time: Extra Time in How It's Decided is live");
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mt-3" }, tiles.map(([l, v, sub, col]) => /* @__PURE__ */ React.createElement("div", { key: l, style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "6px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, l), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 18, fontWeight: 700, color: col, lineHeight: 1.15 }) }, v), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim } }, sub)))), pointers.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.coinDeep, background: C.cardHi, borderRadius: 8, padding: "6px 10px", marginTop: 8 } }, "Market read: ", pointers.join("; "), "."));
-  })(), st.players && st.players.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 } }, "Key players"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-2" }, st.players.map((p) => /* @__PURE__ */ React.createElement("div", { key: p.n, className: "flex items-center gap-2", style: { background: C.night, border: `1px solid ${C.line}`, borderRadius: 10, padding: "4px 10px 4px 4px" } }, /* @__PURE__ */ React.createElement(PlayerAvatar, { teamName: name, num: p.num, name: p.n, size: 30 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: C.chalk } }, p.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.coin } }, p.g, " goals", p.a ? ` · ${p.a} assists` : "")))))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 } }, "Match by match · newest first"), [...st.form].reverse().map((m, i) => {
-    const d = m.xg - m.xga;
-    const verdict = m.r === "W" ? d >= 0.7 ? ["Dominant", C.live] : d >= 0.2 ? ["Deserved", C.live] : d > -0.2 ? ["Edged it", C.coin] : ["Against the run of play", C.out] : m.r === "D" ? m.pens ? ["Through on pens", C.coin] : ["Tight", C.coin] : d >= 0.2 ? ["Unlucky", C.coin] : ["Beaten fairly", C.out];
-    const maxBar = 4;
-    return /* @__PURE__ */ React.createElement("div", { key: i, style: { borderTop: `1px solid ${C.line}`, padding: "8px 0" } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { width: 20, height: 20, lineHeight: "20px", borderRadius: "50%", textAlign: "center", fontSize: 11, fontWeight: 700, color: C.ink, background: formColor(m.r) }) }, m.r), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 15, fontWeight: 700 }) }, m.s), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, "v ", m.o, m.pens ? " (pens)" : "", m.et ? " (AET)" : ""), i === 0 && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: C.coinDeep, background: C.coin + "22", borderRadius: 999, padding: "1px 7px", letterSpacing: 1 } }, "LATEST"), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 10, fontWeight: 600, color: verdict[1], border: `1px solid ${verdict[1]}55`, borderRadius: 999, padding: "2px 8px" } }, verdict[0])), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 mt-1", style: { fontSize: 10, color: C.chalkDim } }, /* @__PURE__ */ React.createElement("span", { style: { width: 44 } }, "xG ", m.xg.toFixed(2)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 5, borderRadius: 3, background: C.night, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, m.xg / maxBar * 100) + "%", height: "100%", background: C.live } }))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2", style: { fontSize: 10, color: C.chalkDim, marginTop: 2 } }, /* @__PURE__ */ React.createElement("span", { style: { width: 44 } }, "xGA ", m.xga.toFixed(2)), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 5, borderRadius: 3, background: C.night, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: Math.min(100, m.xga / maxBar * 100) + "%", height: "100%", background: C.out } }))), m.note && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, marginTop: 4, fontStyle: "italic" } }, m.note));
-  })), /* @__PURE__ */ React.createElement("div", { style: { height: 6, borderRadius: 3, background: C.night, border: `1px solid ${C.line}`, overflow: "hidden", marginTop: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: st.prob + "%", height: "100%", background: `linear-gradient(90deg, ${C.coinDeep}, ${C.coin})` } }))))), tab === "value" && /* @__PURE__ */ React.createElement(React.Fragment, null, me && /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, "You are"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 700, textTransform: "uppercase" }) }, oName(league.owners.find((o) => o.id === me)))), editingName ? /* @__PURE__ */ React.createElement("div", { className: "flex gap-2", style: { flex: 1, maxWidth: 240 } }, /* @__PURE__ */ React.createElement("input", { value: editName, onChange: (e) => setEditName(e.target.value), placeholder: "New name", style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }), /* @__PURE__ */ React.createElement("button", { onClick: async () => {
+    const Recent = ({ nm }) => {
+      const st = TEAM_STATS[nm];
+      return /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 8 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }) }, flag(nm), " ", nm, " · road to the final"), [...st.form].reverse().map((m, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "6px 0", borderTop: i ? `1px solid ${C.line}` : "none" } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { width: 20, height: 20, borderRadius: 5, background: m.r === "W" ? C.live : m.r === "L" ? C.out : C.coin, color: "#fff", fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }) }, m.r), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, display), { fontSize: 13, fontWeight: 700 }) }, m.s), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalkDim } }, "v ", m.o, m.et ? " (AET)" : ""), i === 0 && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, fontWeight: 700, color: C.coinDeep, background: C.coin + "22", borderRadius: 999, padding: "1px 7px" } }, "LATEST"), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 10, color: C.chalkDim } }, "xG ", m.xg.toFixed(1))), m.note && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, lineHeight: 1.45, marginTop: 2, paddingLeft: 28 } }, m.note))));
+    };
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Matchup, { home: "Spain", away: "Argentina", kickoff: "Mon 5am", badge: "🏆 The Final", accent: "#C0392B" }), /* @__PURE__ */ React.createElement(Matchup, { home: "France", away: "England", kickoff: "Sun 7am", badge: "🥉 3rd place", accent: C.coinDeep }), /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("button", { onClick: () => setStatsHelp(!statsHelp), className: "flex items-center justify-between", style: { width: "100%", background: "transparent", border: "none", padding: 0, textAlign: "left" } }, /* @__PURE__ */ React.createElement(H, null, "How to read this"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.chalkDim } }, statsHelp ? "▾" : "▸")), statsHelp && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, lineHeight: 1.65, marginTop: 8 } }, /* @__PURE__ */ React.createElement("b", null, "Win %"), " is the model's advance probability, normalised head to head. ", /* @__PURE__ */ React.createElement("b", null, "The bars"), " show each team's edge, the highlighted side is statistically stronger on that row. ", /* @__PURE__ */ React.createElement("b", null, "xG/xGA"), " are chance quality created and allowed: the truest signal. ", /* @__PURE__ */ React.createElement("b", null, "Finishing"), " above xG runs hot and tends to regress. ", /* @__PURE__ */ React.createElement("b", null, "What the numbers say"), " converts all of it into the markets it points at.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, "The honest bit: these are edges, not certainties. Spain conceded to Belgium the day after the model called their defence elite. Bet the tilt, never the lock."))), /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement(H, null, "Road to the final"), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8 } }, /* @__PURE__ */ React.createElement(Recent, { nm: "Spain" }), /* @__PURE__ */ React.createElement(Recent, { nm: "Argentina" }), /* @__PURE__ */ React.createElement(Recent, { nm: "France" }), /* @__PURE__ */ React.createElement(Recent, { nm: "England" }))));
+  })(), tab === "value" && /* @__PURE__ */ React.createElement(React.Fragment, null, me && /* @__PURE__ */ React.createElement(Card, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, textTransform: "uppercase", letterSpacing: 1 } }, "You are"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, display), { fontSize: 20, fontWeight: 700, textTransform: "uppercase" }) }, oName(league.owners.find((o) => o.id === me)))), editingName ? /* @__PURE__ */ React.createElement("div", { className: "flex gap-2", style: { flex: 1, maxWidth: 240 } }, /* @__PURE__ */ React.createElement("input", { value: editName, onChange: (e) => setEditName(e.target.value), placeholder: "New name", style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 }) }), /* @__PURE__ */ React.createElement("button", { onClick: async () => {
     const nm = editName.trim();
     if (!nm) {
       setEditingName(false);
