@@ -1571,7 +1571,7 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
         { detail: `${m.legs.length}-leg multi @ ${fmtOdds(m.odds)}`, aud: "own:" + m.ownerId }
       );
     }
-    appendLog(`All multis voided and stakes refunded (rules clarification). ${multis.length} bets affected.`);
+    appendLog(`Admin voided all ${multis.length} multis: ${coins} coins refunded across ${new Set(multis.map((b) => b.ownerId)).size} players`, { aud: "admin" });
     flash(`${multis.length} multis voided, ${coins} coins refunded`);
   };
   const restoreQFs = async () => {
