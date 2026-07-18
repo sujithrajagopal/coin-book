@@ -661,6 +661,7 @@ function App() {
   const [slipMode, setSlipMode] = useState("singles");
   const [multiStake, setMultiStake] = useState(5);
   const [expandedRow, setExpandedRow] = useState("");
+  const [logAdminView, setLogAdminView] = useState(false);
   const [logWho, setLogWho] = useState("");
   const [logGame, setLogGame] = useState("");
   const [auditOpenId, setAuditOpenId] = useState("");
@@ -1528,6 +1529,51 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
     { home: "France", away: "Spain", rH: 0, rA: 2, w: "away", dec: "90", scorers: ["Oyarzabal", "Pedro Porro"] },
     { home: "England", away: "Argentina", rH: 1, rA: 2, w: "away", dec: "90", scorers: ["Gordon", "Fernandez", "Lautaro Martinez"] }
   ];
+  const voidBet = async (betId, why) => {
+    if (!requireAdmin()) return;
+    let cur = bets;
+    try {
+      const r = await window.storage.get(K_BETS, true);
+      if (r && r.value) cur = JSON.parse(r.value);
+    } catch (e) {
+    }
+    const b = cur.find((x) => x.id === betId);
+    if (!b) {
+      flash("Bet not found");
+      return;
+    }
+    const o = league.owners.find((x) => x.id === b.ownerId);
+    await saveBets(cur.filter((x) => x.id !== betId));
+    appendLog(
+      `Your bet was voided by the admin: ${b.stake} coins refunded${why ? ` (${why})` : ""}`,
+      { detail: `${pickLabel(b)} @ ${fmtOdds(b.odds)} · ${b.stake} coins`, aud: "own:" + b.ownerId }
+    );
+    flash(`Voided: ${b.stake} coins refunded`);
+  };
+  const voidAllMultis = async () => {
+    if (!requireAdmin()) return;
+    let cur = bets;
+    try {
+      const r = await window.storage.get(K_BETS, true);
+      if (r && r.value) cur = JSON.parse(r.value);
+    } catch (e) {
+    }
+    const multis = cur.filter((b) => b.market === "multi");
+    if (multis.length === 0) {
+      flash("No multis to void");
+      return;
+    }
+    const coins = multis.reduce((s, b) => s + b.stake, 0);
+    await saveBets(cur.filter((b) => b.market !== "multi"));
+    for (const m of multis) {
+      appendLog(
+        `Your multi was voided: ${m.stake} coins refunded (multi rules clarification)`,
+        { detail: `${m.legs.length}-leg multi @ ${fmtOdds(m.odds)}`, aud: "own:" + m.ownerId }
+      );
+    }
+    appendLog(`All multis voided and stakes refunded (rules clarification). ${multis.length} bets affected.`);
+    flash(`${multis.length} multis voided, ${coins} coins refunded`);
+  };
   const restoreQFs = async () => {
     if (!requireAdmin()) return;
     let lg = leagueRef.current;
@@ -1653,7 +1699,35 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
       style: __spreadProps(__spreadValues({}, display), { marginTop: 6, width: "100%", fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: C.chalk, background: C.cardHi, border: `1px solid ${C.line}`, borderRadius: 8, padding: "9px 0" })
     },
     "⚑ Fix Final + 3rd-place fixtures"
-  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies every completed match (4 QFs + 2 semis) with correct scores, winners and scorers, matched by team name so it always finds the right fixture. Safe to tap anytime: it never touches the Final or 3rd-place game, and points recompute instantly.")), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
+  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: C.chalkDim, marginTop: 4 } }, "Re-applies every completed match (4 QFs + 2 semis) with correct scores, winners and scorers, matched by team name so it always finds the right fixture. Safe to tap anytime: it never touches the Final or 3rd-place game, and points recompute instantly.")), /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${C.line}`, borderRadius: 8, padding: "10px 12px", marginBottom: 12 } }, /* @__PURE__ */ React.createElement(H, null, "Void bets"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.chalkDim, margin: "3px 0 8px" } }, "Voiding removes a bet and refunds its coins. Use it for genuine rule confusion, never after a result is known if the bet would have won. Every void is logged publicly with the pick."), (() => {
+    const multis = bets.filter((b) => b.market === "multi");
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between", style: { marginBottom: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600 } }, multis.length, " multi", multis.length === 1 ? "" : "s", " on the board"), multis.length > 0 && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          if (confirm(`Void ALL ${multis.length} multis and refund every stake?`)) voidAllMultis();
+        },
+        style: __spreadProps(__spreadValues({}, body), { fontSize: 11, fontWeight: 700, color: "#FFF", background: C.out, border: "none", borderRadius: 7, padding: "5px 10px" })
+      },
+      "Void all multis"
+    )), multis.map((b) => {
+      const o = league.owners.find((x) => x.id === b.ownerId);
+      const settled = (b.legs || []).every((l) => {
+        const f = fxById(l.matchId);
+        return f && f.settled;
+      });
+      return /* @__PURE__ */ React.createElement("div", { key: b.id, className: "flex items-center justify-between gap-2", style: { borderTop: `1px solid ${C.line}`, padding: "6px 0" } }, /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700 } }, oName(o), " · ", b.legs.length, "-leg · ", b.stake, " coins @ ", fmtOdds(b.odds)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.chalkDim, overflow: "hidden", textOverflow: "ellipsis" } }, b.legs.map((l) => l.label).join(" × "))), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => {
+            if (confirm(`Void ${oName(o)}'s ${b.stake}-coin multi?`)) voidBet(b.id, "multi rules clarification");
+          },
+          style: __spreadProps(__spreadValues({}, body), { fontSize: 11, fontWeight: 700, color: settled ? C.chalkDim : C.out, background: "transparent", border: `1px solid ${settled ? C.line : C.out}`, borderRadius: 7, padding: "5px 10px", flexShrink: 0 })
+        },
+        "Void"
+      ));
+    }));
+  })()), /* @__PURE__ */ React.createElement(H, null, "Fixture manager"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.chalkDim, margin: "4px 0 8px" } }, "Odds, goal rates, scorer lists, locks and results for every fixture. All changes are logged publicly."), league.fixtures.map((fx) => /* @__PURE__ */ React.createElement(FixtureAdmin, { key: fx.id, fx, setFixture, settleFixture, appendLog })), /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => {
@@ -1993,12 +2067,27 @@ Highest points after the Final wins. Ties break by fewer coins spent.`;
   ), openRule === i && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, lineHeight: 1.55, color: C.chalk, padding: "0 2px 12px" } }, body2)))), tab === "log" && (() => {
     const who = logWho ? oName(league.owners.find((o) => o.id === logWho)) : "";
     const gm = logGame ? league.fixtures.find((f) => f.id === logGame) : null;
+    const isAdminEntry = (e) => e.aud === "admin" || /^Admin /.test(e.msg || "");
+    const privOwner = (e) => e.aud && e.aud.indexOf("own:") === 0 ? e.aud.slice(4) : null;
     const filtered = log.filter((e) => {
+      const po = privOwner(e);
+      if (po) {
+        if (po !== me && !adminOk) return false;
+      } else if (isAdminEntry(e)) {
+        if (!(adminOk && logAdminView)) return false;
+      } else if (logAdminView) return false;
       if (who && e.msg.indexOf(who) === -1) return false;
       if (gm && e.msg.indexOf(gm.home) === -1 && e.msg.indexOf(gm.away) === -1) return false;
       return true;
     });
-    return /* @__PURE__ */ React.createElement(Card, { style: { padding: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement(H, null, "Change log"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalkDim } }, filtered.length, " of ", log.length, " events · full history")), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-2" }, /* @__PURE__ */ React.createElement("select", { value: logWho, onChange: (e) => setLogWho(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All players"), league.owners.filter((o) => o.name.trim()).map((o) => /* @__PURE__ */ React.createElement("option", { key: o.id, value: o.id }, o.name))), /* @__PURE__ */ React.createElement("select", { value: logGame, onChange: (e) => setLogGame(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All matches"), league.fixtures.map((f) => /* @__PURE__ */ React.createElement("option", { key: f.id, value: f.id }, f.home, " v ", f.away))))), filtered.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: 14, fontSize: 13, color: C.chalkDim } }, "No events match these filters."), filtered.map((e, i) => {
+    return /* @__PURE__ */ React.createElement(Card, { style: { padding: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement(H, null, logAdminView ? "Admin changelog" : "Match log"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.chalkDim } }, filtered.length, " shown"), adminOk && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setLogAdminView(!logAdminView),
+        style: __spreadProps(__spreadValues({}, body), { fontSize: 10, fontWeight: 700, color: logAdminView ? C.ink : C.chalkDim, background: logAdminView ? C.coin : "transparent", border: `1px solid ${logAdminView ? C.coin : C.line}`, borderRadius: 999, padding: "3px 10px", whiteSpace: "nowrap" })
+      },
+      logAdminView ? "Admin log" : "Public log"
+    ))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-2" }, /* @__PURE__ */ React.createElement("select", { value: logWho, onChange: (e) => setLogWho(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All players"), league.owners.filter((o) => o.name.trim()).map((o) => /* @__PURE__ */ React.createElement("option", { key: o.id, value: o.id }, o.name))), /* @__PURE__ */ React.createElement("select", { value: logGame, onChange: (e) => setLogGame(e.target.value), style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1, padding: "5px 8px", fontSize: 12 }) }, /* @__PURE__ */ React.createElement("option", { value: "" }, "All matches"), league.fixtures.map((f) => /* @__PURE__ */ React.createElement("option", { key: f.id, value: f.id }, f.home, " v ", f.away))))), filtered.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: 14, fontSize: 13, color: C.chalkDim } }, "No events match these filters."), filtered.map((e, i) => {
       const f = e.matchId ? league.fixtures.find((x) => x.id === e.matchId) : null;
       const unsealed = !e.detail || !f || f.settled || f.locked || Date.now() >= Date.parse(f.kickoff) && !f.forceOpen;
       return /* @__PURE__ */ React.createElement("div", { key: e.t + "_" + i, style: { padding: "9px 14px", borderBottom: `1px solid ${C.line}`, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim, fontSize: 11, marginRight: 8 } }, new Date(e.t).toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })), e.msg, e.detail ? unsealed ? /* @__PURE__ */ React.createElement("span", { style: { color: C.coinDeep, fontWeight: 600 } }, " : ", e.detail) : /* @__PURE__ */ React.createElement("span", { style: { color: C.chalkDim } }, " 🔒 receipt sealed until kickoff") : null);
